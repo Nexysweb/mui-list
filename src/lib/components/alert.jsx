@@ -39,19 +39,16 @@ class Alert extends Component {
     const { noMargin } = this.props;
     let dismissible = null;
 
-    // to check
-    /*if (this.state.dismissible) {
+    if (this.state.dismissible) {
       dismissible = <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={this.handleDismiss}>
           <span aria-hidden="true">&times;</span>
         </button>;
-    }*/
+    }
 
-    let iconName;
-    //const iconName = UiUtils.colorToIcon(this.props.color);
+    const iconName = UiUtils.colorToIcon(this.props.color);
 
     let icon = null;
-    // to check
-    //if (iconName !== null && this.state.showIcon) icon = <Icon name={iconName} />;
+    if (iconName !== null && this.state.showIcon) icon = <Icon name={iconName} />;
 
     // TODO: use styled component instead of app.css classes (use standard orange, green etc)
     return (
