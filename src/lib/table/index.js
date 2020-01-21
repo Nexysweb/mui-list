@@ -4,8 +4,9 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+// todo: withDraggable
 import { Alert, Tooltip, OverflowTooltip, IconButton, Loader, Button } from '../components';
-//withDraggable, 
+
 import { Wrapper, Select, Input, withForm } from '../components/form';
 //import withDragDropContext from '../components/withDragDropContext.js';
 
@@ -336,7 +337,8 @@ class MuiTable extends Component {
 
   renderRow = (item, actions, expandable, columns, parentKey, i) => {
     let { view, edit, deleteAction, toggle } = actions;
-    const { config, toggleExpansion } = this.props; //draggable,  // to be restored once DnD issue solved
+    // todo , draggable
+    const { config, toggleExpansion } = this.props;
 
     /*** HETEROGENEOUS TABLE ***/
     let flip = false;
@@ -431,7 +433,7 @@ class MuiTable extends Component {
       </Fragment>
     );
 
-    // to check
+    // todo: uncomment once bug with CRA solved
     /*if (draggable) {
       const { move, drop } = draggable;
       const DraggableRow = withDraggable(TableRow)(rowContent);
@@ -563,4 +565,4 @@ MuiTable.propTypes = {
   sorting: PropTypes.array.isRequired
 }
 
-export default (MuiTable);
+export default (MuiTable); // todo: withDragDropContext

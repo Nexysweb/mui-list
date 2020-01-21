@@ -9,6 +9,7 @@ import OverflowTooltip from './overflow-tooltip.jsx';
 
 // crashes tests
 //import withDraggable from './draggable.jsx';
+// todo: readd once issue with CRA solved
 
 export {
   Alert,

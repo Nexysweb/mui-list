@@ -4,8 +4,10 @@
   "license": "MIT",
   "dependencies": {
     "@babel/runtime": "^7.8.3",
+    "@nexys/utils": "^3.5.15",
     "immutability-helper": "^3.0.1",
-    "@nexys/utils": "^3.5.15"
+    "react-dnd-cjs": "^9.5.1",
+    "react-dnd-html5-backend-cjs": "^9.5.1"
   },
   "scripts": {
     "lint": "eslint src/",
@@ -35,20 +37,19 @@
     ]
   },
   "devDependencies": {
-    "@nexys/babelsetup": "^0.0.6",
     "@babel/preset-react": "^7.8.3",
     "@material-ui/core": "^4.8.3",
     "@material-ui/icons": "^4.5.1",
-    "react-dnd": "8",
-    "react-dnd-html5-backend": "2.5",
-    "react-paginate": "^6.3.2",
-    "styled-components": "^5.0.0",
+    "@nexys/babelsetup": "^0.0.6",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "react": "^16.12.0",
+    "react-dnd-html5-backend": "2.5",
     "react-dom": "^16.12.0",
+    "react-paginate": "^6.3.2",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "3.2.0"
+    "react-scripts": "3.2.0",
+    "styled-components": "^5.0.0"
   }
 }
