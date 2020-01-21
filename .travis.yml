@@ -10,5 +10,5 @@ cache: yarn
 
 script:
 - yarn test
-- yarn build
+- yarn buildpackage
 
