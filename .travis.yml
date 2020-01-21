@@ -9,7 +9,6 @@ node_js: '12'
 cache: yarn
 
 script:
-# tests to be enabled
-#- yarn test
+- yarn test
 - yarn build
 

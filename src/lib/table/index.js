@@ -4,9 +4,10 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Alert, Tooltip, OverflowTooltip, IconButton, Loader, withDraggable, Button } from '../components';
+import { Alert, Tooltip, OverflowTooltip, IconButton, Loader, Button } from '../components';
+//withDraggable, 
 import { Wrapper, Select, Input, withForm } from '../components/form';
-import withDragDropContext from '../components/withDragDropContext.js';
+//import withDragDropContext from '../components/withDragDropContext.js';
 
 import {
   Table, 
@@ -430,11 +431,12 @@ class MuiTable extends Component {
       </Fragment>
     );
 
-    if (draggable) {
+    // to check
+    /*if (draggable) {
       const { move, drop } = draggable;
       const DraggableRow = withDraggable(TableRow)(rowContent);
       return <DraggableRow key={item.id} idx={i} {...item} onMove={move} onDrop={drop} />;
-    }
+    }*/
 
     const row = <TableRow key={i} style={config && config.rowStyles && config.rowStyles(item)}>{rowContent}</TableRow>
 
@@ -561,4 +563,4 @@ MuiTable.propTypes = {
   sorting: PropTypes.array.isRequired
 }
 
-export default withDragDropContext(MuiTable);
+export default (MuiTable);

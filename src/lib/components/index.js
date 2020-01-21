@@ -7,8 +7,8 @@ import IconButton from './icon-button.jsx';
 import Tooltip from './tooltip.jsx';
 import OverflowTooltip from './overflow-tooltip.jsx';
 
-import withDraggable from './draggable.jsx';
-
+// crashes tests
+//import withDraggable from './draggable.jsx';
 
 export {
   Alert,
@@ -17,5 +17,5 @@ export {
   IconButton,
   Tooltip,
   OverflowTooltip,
-  withDraggable
+  //withDraggable
 }

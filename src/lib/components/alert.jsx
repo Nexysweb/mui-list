@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Icon from '@material-ui/core/Icon';
 
-
 class Alert extends Component {
   constructor(props) {
     super(props);
@@ -40,19 +39,19 @@ class Alert extends Component {
     const { noMargin } = this.props;
     let dismissible = null;
 
-    if (this.state.dismissible) {
-      dismissible = (
-        <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={this.handleDismiss}>
+    // to check
+    /*if (this.state.dismissible) {
+      dismissible = <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={this.handleDismiss}>
           <span aria-hidden="true">&times;</span>
-        </button>
-      );
-    }
+        </button>;
+    }*/
 
     let iconName;
     //const iconName = UiUtils.colorToIcon(this.props.color);
 
     let icon = null;
-    if (iconName !== null && this.state.showIcon) icon = <Icon name={iconName} />;
+    // to check
+    //if (iconName !== null && this.state.showIcon) icon = <Icon name={iconName} />;
 
     // TODO: use styled component instead of app.css classes (use standard orange, green etc)
     return (
