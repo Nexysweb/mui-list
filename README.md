@@ -7,3 +7,8 @@
 Multi-purpose list for MUI
 
 See here: https://nexysweb.github.io/mui-list/
+
+## References
+
+[Material UI](https://github.com/mui-org/material-ui)
+[World Countries](https://mledoze.github.io/countries/)
