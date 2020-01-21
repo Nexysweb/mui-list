@@ -336,7 +336,7 @@ class MuiTable extends Component {
 
   renderRow = (item, actions, expandable, columns, parentKey, i) => {
     let { view, edit, deleteAction, toggle } = actions;
-    const { config, draggable, toggleExpansion } = this.props;
+    const { config, toggleExpansion } = this.props; //draggable,  // to be restored once DnD issue solved
 
     /*** HETEROGENEOUS TABLE ***/
     let flip = false;

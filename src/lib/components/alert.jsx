@@ -45,7 +45,7 @@ class Alert extends Component {
         </button>;
     }
 
-    const iconName = UiUtils.colorToIcon(this.props.color);
+    let iconName;
 
     let icon = null;
     if (iconName !== null && this.state.showIcon) icon = <Icon name={iconName} />;

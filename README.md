@@ -2,7 +2,6 @@
 
 [![npm version](https://badge.fury.io/js/%40nexys%2Fmui%2Flist.svg)](https://www.npmjs.com/package/@nexys/mui-list)
 [![npm version](https://img.shields.io/npm/v/@nexys/mui-list.svg)](https://www.npmjs.com/package/@nexys/mui-list)
-
 [![TavisCI](https://travis-ci.com/Nexysweb/mui-list.svg?branch=master)](https://travis-ci.com/Nexysweb/mui-list)
 
 Multi-purpose list for MUI
