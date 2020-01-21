@@ -1,8 +1,9 @@
 {
-  "name": "mui-list",
+  "name": "@nexys/mui-list",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@nexys/babelsetup": "^0.0.6",
     "@nexys/utils": "^3.5.15",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -15,7 +16,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "PUBLIC_URL=/string-replace react-scripts build;rm -rf docs;mv build docs;cp docs/index.html docs/404.html",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
