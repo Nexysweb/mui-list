@@ -1,16 +1,57 @@
 import React, { Component, Fragment } from 'react';
 import update from 'immutability-helper';
 
-import Icon from '@material-ui/core/Icon';
-
 import { Loader } from '../components';
-import { Wrapper, Input, OptionGroup } from '../components/form';
+
 import { GridWrapper, GridCell } from '../components/grid';
 
 import Table from '../table';
 
+
 import Utils from '@nexys/utils';
 
+import * as ListUtils from './utils';
+import Search from './search';
+import Status from './status';
+
+const getPagination = (pagination) => {
+  if (!pagination) {
+    return null;
+  }
+
+  const { rowsPerPageOptions, rowsPerPage } = pagination;
+  return {
+    rows: [],
+    rowsPerPageOptions: rowsPerPageOptions || [10, 30, 50, 100],
+    page: 0,
+    rowsPerPage: rowsPerPage || 50,
+    total: null
+  };
+}
+
+const getSorting = (sorting) => {
+  if (!sorting) {
+    return null;
+  }
+
+  const { order, orderBy } = sorting;
+  return {
+    order: order || 'asc',
+    orderBy
+  };
+}
+
+const getValues = (values, expandable) => {
+  // account for Expandables
+  if (expandable) {
+    const { mapping } = expandable;
+    if (mapping) {
+      return mapping(values);
+    }
+  }
+
+  return values;
+}
 
 class List extends Component {
   constructor(props) {
@@ -28,29 +69,9 @@ class List extends Component {
 
     const searchIn = columns.filter(item => item.table && item.table.search).map(item => item.name);
 
-    let pagination = null;
-    if (config.pagination) {
-      const { rowsPerPageOptions, rowsPerPage } = config.pagination;
-      pagination = {
-        rows: [],
-        rowsPerPageOptions: rowsPerPageOptions || [10, 30, 50, 100],
-        page: 0,
-        rowsPerPage: rowsPerPage || 50,
-        total: null
-      };
-    }
-
-    let sorting = null;
-    if (config.sorting) {
-      const { order, orderBy } = config.sorting;
-      sorting = {
-        order: order || 'asc',
-        orderBy
-      };
-    }
-
-    let { values } = props;
-    values = this.prepareExpandable(values);
+    const pagination = getPagination(config.pagination);
+    const sorting = getSorting(config.sorting);
+    const values = getValues(props.values, props.config.expandable);
 
     this.state = {
       values,
@@ -68,23 +89,10 @@ class List extends Component {
     };
   }
 
-  prepareExpandable = values => {
-    const { config: { expandable } } = this.props;
-    if (expandable) {
-      const { mapping } = expandable;
-      if (mapping) {
-        return mapping(values);
-      }
-    }
-    return values;
-  }
-
   componentWillReceiveProps(nextProps) {
-    let { values } = nextProps;
-    values = this.prepareExpandable(values);
+    const values =  getValues(nextProps.values, this.props.config.expandable);
     this.setState({values, updateLoading: false});
   }
-
 
   loadingUpdate = () => this.setState({updateLoading: true});
 
@@ -218,99 +226,13 @@ class List extends Component {
   /*******************/
 
 
-  /*** STATUS WIDGET ***/
-  renderStatus = () => {
-    const { config } = this.props;
-    const { filters } = this.state;
-
-    // TODO: work with status name?
-    return (
-      <OptionGroup
-        name="status"
-        options={config.status}
-        selectedValue={filters.status.value}
-        handleChange={this.handleFilterChange}
-        label={'status.select'} // TODO: translation: i18n.translate('status.select')
-        // selectedColor={adminColor}
-        compact
-        simple
-        all
-      />
-    );
-  }
+ 
   /******************/
 
-  /*** SEARCH WIDGET ***/
-  renderSearch = () => {
-    const { filters } = this.state;
-
-    // TODO
-    // - debounce: https://toughcompetent.com/blog/es5-es6-debounce-react-events-on-inputs/
-    // - throttle: https://www.peterbe.com/plog/how-to-throttle-and-debounce-an-autocomplete-input-in-react
-    // use: https://www.npmjs.com/package/throttle-debounce
-    return (
-      <Wrapper name="search" label={'filters.search'} inline>
-        <Input
-          value={filters.search.value}
-          onChange={this.handleFilterChange}
-          placeholder={'filters.search.type'} // TODO: i18n.translate(..)
-          suffix={<Icon color="primary">search</Icon>}
-        />
-      </Wrapper>
-    );
-  }
-  /******************/
+  
 
 
-  filter = () => {
-    let { values, filters } = this.state;
-
-    if (values) {
-      const { search: searchFilter, status: statusFilter } = filters;
-
-      if (statusFilter && statusFilter.value > 0) {
-        values = values.filter(item => item.status.id === statusFilter.value);
-      }
-
-      if (searchFilter && searchFilter.value) {
-        values = values.filter(item => {
-          const searchValue = searchFilter.value.toLowerCase();
-          // TODO: columns, search?
-          return searchFilter.searchIn.some(nameItem => {
-            let accessedValue = Utils.ds.get(nameItem, item);
-            accessedValue = isNaN(accessedValue) ? accessedValue.toLowerCase() : String(accessedValue);
-            if (accessedValue) return accessedValue.includes(searchValue);
-            else return false;
-          });
-        });
-      }
-
-      filters = Utils.ds.removeProps(filters, ['status', 'search']);
-      const filterCols = Object.keys(filters);
-
-      filterCols.forEach(colName => {
-        let filter = filters[colName];
-        console.log(filter, filter.active);
-        if (filter && filter.filterIsActive) {
-          filter = Utils.ds.removeProp(filter, 'filterIsActive');
-          const anySet = Object.values(filter).some(item => item);
-          if (anySet) {
-            // TODO: boolean vs domain
-            values = values.filter(item => {
-              // get column object or value from linearized key
-              let colItem = Utils.ds.get(colName, item);
-              if (colItem === null || colItem === undefined) colItem = Utils.ds.get(colName + "Set", item);
-              // get value from column object or keep value from linearized key
-              const value = typeof colItem === 'object' && colItem !== null ? colItem.name || colItem.id : colItem; 
-              return filter[value];
-            });
-          }
-        }
-      });
-    }
-
-    return values;
-  }
+  
  
   toggle = (storeKey, values, prefix=null) => id => {
     let key = id;
@@ -414,31 +336,24 @@ class List extends Component {
   }
 
   render() {
-    let { config: { search, status } } = this.props;
-    const { filters, sorting, pagination, updatables, insertables, updateLoading } = this.state;
+    const { config } = this.props;
 
-    let filteredValues = this.filter();
+    const { values, filters, sorting, pagination, updatables, insertables, updateLoading } = this.state;
+
+    const filteredValues = ListUtils.filter(values, filters);
     
+    // what does this mean ?
     if (!filteredValues) return <Loader />;
 
-    if (sorting) {
-      const { order, orderBy } = sorting;
-      filteredValues = Utils.ds.sortByProp(filteredValues, orderBy, order === 'asc'); 
-    }
-
-    let pageValues = null;
-    if (pagination) {
-      const { page, rowsPerPage } = pagination;
-      pageValues = filteredValues.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-    }
-
+    const sortedValues = ListUtils.sort(filteredValues, sorting);
+    const pagedValues = ListUtils.page(sortedValues, pagination);
 
     return (
       <Fragment>
-        {(status || search) && (
+        {(config.status || config.search) && (
           <GridWrapper admin>
-            <GridCell span2>{status && this.renderStatus()}</GridCell>
-            <GridCell>{search && this.renderSearch()}</GridCell>
+            <GridCell span2>{config.status && <Status status={config.status} filters={filters} onChange={this.handleFilterChange}/>}</GridCell>
+            <GridCell>{config.search && <Search filters={filters} onChange={this.handleFilterChange}/>}</GridCell>
           </GridWrapper>
         )}
         <div style={{marginTop: 30}}>
@@ -446,7 +361,7 @@ class List extends Component {
             {...this.props}
             updateLoading={updateLoading}
             loadingUpdate={this.loadingUpdate}
-            values={pageValues || filteredValues}
+            values={pagedValues}
             handleEdit={this.handleEdit}
             handleAdd={this.handleAdd}
             filters={filters}

@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 import List from 'lib/list';
 
 // data taken from 
@@ -22,17 +21,11 @@ export default () => {
       const k = keys[0]
       return `${x.currencies[k].name} (${k})`
     }},
-    //{name: 'iso2', label: 'ISO2', render: x => x.cca2},
-    //{name: 'iso3', label: 'ISO3', render: x => x.cca3},
   ];
 
   const config = {
-    //view: r => '/test',
-    //update: (id, r) => {},
-    //delete: (id, r) => this.props.delete(r.certId, id),
-    //edit: true,
-    //search: true,
-    //sorting: {orderBy: 'capital', desc: true}
+
+    search: true,
   };
 
   return (<><h2>Filter examples</h2><List

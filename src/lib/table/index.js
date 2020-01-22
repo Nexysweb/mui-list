@@ -565,4 +565,4 @@ MuiTable.propTypes = {
   sorting: PropTypes.array.isRequired
 }
 
-export default (MuiTable); // todo: withDragDropContext
+export default (MuiTable); // todo: withDragDropContext (i.e. CRA bug)
