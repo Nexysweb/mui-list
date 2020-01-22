@@ -24,17 +24,9 @@ import {
   TablePaginationActions
 } from '../components/table';
 
-import Icon from '@material-ui/core/Icon';
-
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-
+import { Menu, MenuItem, Icon, FormControlLabel, Checkbox } from '@material-ui/core';
 
 import Utils from '@nexys/utils';
-
 
 const SubMenu = styled(Menu)`
   ul {
@@ -49,13 +41,7 @@ const SubMenu = styled(Menu)`
 
 
 class MuiTable extends Component {
-  constructor(props) {
-    super(props)
 
-    this.state = {
-      tooltips: {}
-    };
-  }
 
   createSortHandler = colName => e => this.props.onSort(colName);
 
