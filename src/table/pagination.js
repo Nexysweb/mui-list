@@ -1,15 +1,11 @@
 import React from 'react';
-import './App.css';
 
-import List from './lib/list';
+import List from 'lib/list';
 
 // data taken from 
 import  data from 'world-countries';
 
-function App() {
-  console.log(data)
-
-
+export default () => {
   const columns = [
     {name: 'name', label: 'Name', render: x => {
     return <a href={`https://en.wikipedia.org/wiki/${encodeURIComponent(x.name.common)}`}>{x.name.common}</a>
@@ -30,19 +26,15 @@ function App() {
   ];
 
   const config = {
-    //view: r => '/test',
-    //update: (id, r) => {},
-    //delete: (id, r) => this.props.delete(r.certId, id),
-    //edit: true,
-    //search: true,
+    pagination: {
+      rowsPerPage: 10
+    }
   };
 
-  return (<List
+  return (<><h2>Pagination examples</h2><List
       values={data}
       columns={columns}
       config={config}
-    />
+    /></>
   );
 }
-
-export default App;
