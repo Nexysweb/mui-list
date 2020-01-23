@@ -1,6 +1,6 @@
 import React from 'react';
 
-import List from 'lib/list2';
+import List from 'lib/list';
 
 // data taken from 
 import  data from 'world-countries';
