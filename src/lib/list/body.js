@@ -1,18 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-//import Alert from '../alert';
-//import Loader from '../loader';
+
 import Header from './header';
 import DigisI18n from '@nexys/digis-i18n';
 import utils from '@nexys/utils';
 
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
+import { 
+  Table, TableBody, TableCell, TableContainer, TableRow
+ } from '@material-ui/core';
 
-import TableRow from '@material-ui/core/TableRow';
+ import { Alert } from '@material-ui/lab';
 
 const StyledRow = styled(TableRow)`
   ${props => props.borderless && `
@@ -55,7 +53,6 @@ const StyledRow = styled(TableRow)`
 `;
 
 const Loader = props => <span>Loader</span>
-const Alert = props => <span>Alert</span>
 
 const { I18n } = DigisI18n;
 const { get } = utils.ds;
@@ -156,16 +153,18 @@ export default class MyTableBody extends React.Component {
     }
   }
 
-  
-
   renderRows(rows, columns) {
-    
     if (this.props.loading) {
       return <StyledRow><TableCell colSpan={columns.length}><center><div style={{width: '40%'}}><Loader/></div></center></TableCell></StyledRow>;
     }
     if (rows.length === 0) {
-      // this is wrong, it should not be displayed within the table, or s
-      return <StyledRow><TableCell colSpan={columns.length}><center><div style={{width: '60%'}}><Alert color="info">{I18n.translate('users.noRecords')}</Alert></div></center></TableCell></StyledRow>;
+      return <StyledRow>
+        <TableCell colSpan={columns.length}>
+          <center><div style={{width: '60%'}}>
+            <Alert severity="info">{I18n.translate('users.noRecords')}</Alert>
+          </div></center>
+        </TableCell>
+      </StyledRow>;
     }
     return rows.map((r, i) => {
       return (<tr key={i}>

@@ -12,27 +12,39 @@ export default () => {
     }},
     {
       title: 'Capital',
-      render: x => x.capital || ''
+      render: x => x.capital || '',
+      filterName: 'capital',
+      filterType: 'single',
+      filters: [{value: 'Brussels', text: 'Belgium'}, {value: 'Vienna', text: 'Austria'}, {value: 3, text: 'Germany'}]
     },
-    {name: 'currency', title: 'Currency', render: x => {
-      const keys = Object.keys(x.currencies);
+    {
+      name: 'currency',
+      title: 'Currency',
+      render: x => {
+        const keys = Object.keys(x.currencies);
 
-      if (!keys || keys.length === 0) {
-        return '-';
+        if (!keys || keys.length === 0) {
+          return '-';
+        }
+
+        const k = keys[0]
+        return `${x.currencies[k].name} (${k})`
       }
-
-      const k = keys[0]
-      return `${x.currencies[k].name} (${k})`
-    }}
+    }
   ];
+
+  const myFilters = {
+    capital: []
+  }
 
   const config = {};
 
-  return (<><h2>Simple table example</h2><List
+  return (<><h2>Filter example</h2><List
       data={data}
       columns={columns}
       config={config}
       search
+      filters={myFilters}
     /></>
   );
 }

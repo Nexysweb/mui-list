@@ -32,8 +32,13 @@ export const searchInObject = (searchString, object) => Object.keys(object).map(
 .reduce((a, b) => a || b);
 
 export const applyFilter = (data, filters) => {
+  console.log(filters)
+   filters = {capital: 'Vienna'}
+
   const filterArray = Object.keys(filters).map(f => {
-    return {name: f, value: filters[f]}
+    const r = {name: f, value: filters[f]}
+    console.log(r)
+    return r;
   });
 
   if (filterArray.length === 0) {
@@ -45,6 +50,7 @@ export const applyFilter = (data, filters) => {
       const searchValue = f.value;
 
       if (typeof searchValue === 'string' && searchValue === '') {
+        console.log('here')
         return data;
       }
 

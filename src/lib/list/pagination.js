@@ -123,7 +123,10 @@ export default class TablePagination extends React.Component {
     /* eslint-disable-next-line */
     pages.unshift(<li style={liStyle} key="prev" className={selected === 1 ? `${pClass} disabled` : pClass}><a id={1} onClick={this.handleNextPrevious} className="pagination"><ChevronLeft/></a></li>);
     /* eslint-disable-next-line */
-    pages.push(<li style={liStyle} key="next" className={selected === nPage ? `${pClass} disabled` : pClass}><a id={2} onClick={this.handleNextPrevious} disabled={selected === nPage} className="pagination"><ChevronRight/></a></li>);
+    if(selected < nPage) {
+      console.log(`${selected} - ${nPage}`)
+      pages.push(<li style={liStyle} key="next" className={selected === nPage ? `${pClass} disabled` : pClass}><a id={2} onClick={this.handleNextPrevious} disabled={selected === nPage} className="pagination"><ChevronRight/></a></li>);
+    }
 
     return (
       <ul style={{listStyleType: 'none'}}>

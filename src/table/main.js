@@ -1,20 +1,20 @@
 import React from 'react';
 
-import List from 'lib/list';
+import List from 'lib/list2';
 
 // data taken from 
 import  data from 'world-countries';
 
 export default () => {
   const columns = [
-    {name: 'name', title: 'Name', render: x => {
+    {name: 'name', label: 'Name', render: x => {
     return <a href={`https://en.wikipedia.org/wiki/${encodeURIComponent(x.name.common)}`}>{x.name.common}</a>
     }},
     {
-      title: 'Capital',
+      label: 'Capital',
       render: x => x.capital || ''
     },
-    {name: 'currency', title: 'Currency', render: x => {
+    {name: 'currency', label: 'Currency', render: x => {
       const keys = Object.keys(x.currencies);
 
       if (!keys || keys.length === 0) {
@@ -30,7 +30,7 @@ export default () => {
 
   return (<><h2>Simple table example</h2><List
       data={data}
-      columns={columns}
+      def={columns}
       config={config}
     /></>
   );

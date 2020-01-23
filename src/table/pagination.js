@@ -1,11 +1,15 @@
 import React from 'react';
 
+import { Grid } from '@material-ui/core';
+
 import List from 'lib/list';
 
 // data taken from 
 import  data from 'world-countries';
 
 export default () => {
+  const [ itemsPerPage, setItemsPerPage ] = React.useState(10);
+
   const columns = [
     {name: 'name', title: 'Name', render: x => {
     return <a href={`https://en.wikipedia.org/wiki/${encodeURIComponent(x.name.common)}`}>{x.name.common}</a>
@@ -26,12 +30,22 @@ export default () => {
     }}
   ];
 
-  const config = {};
 
-  return (<><h2>Simple table example</h2><List
+  const handlePageNumber = e => {
+    const value = Math.ceil(Number(e.target.value));
+    setItemsPerPage(value);
+  }
+
+  return (<><h2>Pagination example</h2>
+    <Grid md={2}>
+      # of records per page
+      <input width="20%" type="number" value={itemsPerPage} onChange={handlePageNumber}/>
+    </Grid>
+    
+    <List
       data={data}
       columns={columns}
-      config={config}
+      itemsPerPage={itemsPerPage}
     /></>
   );
 }

@@ -89,6 +89,8 @@ export default class TableIndex extends React.Component {
 
   handleFilter = (fName, fValue) => {
     const { onFilter } = this.props;
+    console.log(fName)
+    console.log(fValue)
 
     if (onFilter && typeof onFilter === 'function') {
       onFilter(fName, fValue);

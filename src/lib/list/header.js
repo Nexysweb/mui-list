@@ -44,11 +44,14 @@ export default class Header extends React.Component {
     filters: PropTypes.object
   }
 
-  handleChangeSingleFilter(e) {
-    const fName = e.currentTarget ? e.currentTarget.name : e.name;
-    const fValue = e.currentTarget ? isNaN(e.currentTarget.id) ? e.currentTarget.id : Number(e.currentTarget.id) : e.value;
+  handleChangeSingleFilter(fName, fValue) {
+    //const fName = e.currentTarget ? e.currentTarget.name : e.name;
+    console.log(fName)
+    //const fValue = e.currentTarget ? isNaN(e.currentTarget.id) ? e.currentTarget.id : Number(e.currentTarget.id) : e.value;
+    console.log(fValue)
     const selectedFilter = this.state.selectedFilter;
     selectedFilter[fName] = fValue;
+    console.log(selectedFilter)
 
     this.setState({selectedFilter});
   }
@@ -80,7 +83,7 @@ export default class Header extends React.Component {
   handleSubmitFilter(e) {
     const fName = e.currentTarget.id;
     this.props.onFilter(fName, this.state.selectedFilter[fName]);
-    document.body.click();
+   // document.body.click();
   }
 
   handleKeyDown(e) {
@@ -96,15 +99,21 @@ export default class Header extends React.Component {
   }
 
   renderListPopover(c, typeId) {
+    // go through all the elements in the list
     const fItems = c.filters.map((x, i) => {
       const filter = this.state.selectedFilter[c.filterName];
+      // define whether checked or not
       let isChecked = false;
       if (filter && ((Array.isArray(filter) && filter.includes(x.value)) || (filter === x.value))) {
         isChecked = true;
       }
+      
+      // single filter
       if (typeId === 1) {
-        return <div key={i}><input name={c.filterName} id={x.value} type="radio" onChange={this.handleChangeSingleFilter} checked={isChecked}/> {x.text}</div>;
+        return <div key={i}><input name={c.filterName} type="radio" onChange={() => this.handleChangeSingleFilter(c.filterName, x.value)} checked={isChecked}/> {x.text}</div>;
       }
+      
+      // multi filter
       return <div key={i}><input name={c.filterName} id={x.value} type="checkbox" onChange={this.handleChangeMultiFilter} checked={isChecked}/> {x.text}</div>;
     });
 
@@ -164,6 +173,7 @@ export default class Header extends React.Component {
   // }
 
   renderFilter(c, i) {
+    console.log(c)
     if (!c.filterName) {
       return null;
     }
