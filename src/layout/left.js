@@ -57,7 +57,7 @@ const useStyles = makeStyles(theme => ({
 
 }));
 
-const mainListItems = list.map(l => <Link to={l.path}>
+const mainListItems = list.map((l, i) => <Link key={i} to={l.path}>
     <ListItem button>
       <ListItemText primary={l.label} />
     </ListItem>

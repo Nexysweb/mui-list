@@ -17,7 +17,7 @@ export default () => {
       <Router history={history}>
       <Layout>
         <Switch>
-          {list.map(l =>  <Route exact path={l.path} component={() => <l.Component/>}/>)}
+          {list.map((l, i) =>  <Route key={i} exact path={l.path} component={() => <l.Component/>}/>)}
           <Route component={() => <Public/>}/>
         </Switch>
       </Layout>
