@@ -302,33 +302,18 @@ const MuiTable = props => {
   }
 
   const assembleActions = (config={}, values, key) => {
-    
     const { view=false, edit=false, update=false, create=false } = config;
-    let { delete: deleteAction=false } = config;
-
-    let onChangeEdit, onChangeAdd = false;
-
-    if (edit) {
-      toggleEdit = toggleEdit(values, key);
-      onChangeEdit = handleEdit(key);
-    }
-
-    if (create) {
-      toggleAdd = toggleAdd(values, key);
-      onChangeAdd = handleAdd(key);
-      deleteAction = remove(key); 
-    }
 
     return {
       view,
       edit,
-      toggleEdit,
+      toggleEdit: edit ? toggleEdit(values, key): null,
       update,
-      toggleAdd,
+      toggleAdd: create ? toggleAdd(values, key): null,
       create,
-      deleteAction,
-      onChangeEdit,
-      onChangeAdd
+      deleteAction: create ? remove(key): null,
+      onChangeEdit: edit ? handleEdit(key) : false,
+      onChangeAdd: create ? handleAdd(key): false
     };
   }
 
