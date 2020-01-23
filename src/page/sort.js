@@ -1,14 +1,15 @@
 import React from 'react';
-import './App.css';
+import '../App.css';
 
-import List from './lib/list';
+import List from '../lib/list';
 
 import data from 'world-countries';
 
 
-function App() {
+export default () => {
   const columns = [{ 
-      name: 'name', label: 'Name', render: x => <a href={`https://en.wikipedia.org/wiki/${encodeURIComponent(x.name.common)}`}>{x.name.common}</a>,
+      name: 'name.common', label: 'Name', render: x => <a href={`https://en.wikipedia.org/wiki/${encodeURIComponent(x.name.common)}`}>{x.name.common}</a>,
+      table: { sorting: true }
     }, {
       name: 'capital', label: 'Capital', render: x => x.capital || ''
     }, {
@@ -27,7 +28,12 @@ function App() {
     // {name: 'iso3', label: 'ISO3', render: x => x.cca3},
   ];
 
-  const config = {};
+  const config = {
+    sorting: {
+      orderBy: 'name.common',
+      order: 'desc'
+    }
+  };
 
   return (
     <List
@@ -37,5 +43,3 @@ function App() {
     />
   );
 }
-
-export default App;

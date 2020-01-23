@@ -290,7 +290,6 @@ class List extends Component {
 
       filterCols.forEach(colName => {
         let filter = filters[colName];
-        console.log(filter, filter.active);
         if (filter && filter.filterIsActive) {
           filter = Utils.ds.removeProp(filter, 'filterIsActive');
           const anySet = Object.values(filter).some(item => item);

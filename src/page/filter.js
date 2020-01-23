@@ -1,16 +1,18 @@
 import React from 'react';
-import './App.css';
+import '../App.css';
 
-import List from './lib/list';
+import List from '../lib/list';
 
 import data from 'world-countries';
 
 
-function App() {
+export default () => {
   const columns = [{ 
-      name: 'name', label: 'Name', render: x => <a href={`https://en.wikipedia.org/wiki/${encodeURIComponent(x.name.common)}`}>{x.name.common}</a>,
+      name: 'name.common', label: 'Name', render: x => <a href={`https://en.wikipedia.org/wiki/${encodeURIComponent(x.name.common)}`}>{x.name.common}</a>,
+      table: { search: true }
     }, {
-      name: 'capital', label: 'Capital', render: x => x.capital || ''
+      name: 'capital', label: 'Capital', render: x => x.capital || '',
+      // TODO: why is capital an array? => search won't work unless notation capital[idx] is introduced for name
     }, {
       name: 'currency', label: 'Currency', render: x => {
         const keys = Object.keys(x.currencies);
@@ -27,7 +29,9 @@ function App() {
     // {name: 'iso3', label: 'ISO3', render: x => x.cca3},
   ];
 
-  const config = {};
+  const config = {
+    search: true
+  };
 
   return (
     <List
@@ -37,5 +41,3 @@ function App() {
     />
   );
 }
-
-export default App;

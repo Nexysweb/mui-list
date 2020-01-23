@@ -25,18 +25,34 @@ import Paper from '@material-ui/core/Paper';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 
+
 export const mainListItems = (
   <>
-  <Link to="/">
-    <ListItem button>
-      <ListItemText primary="Home" />
-    </ListItem>
-  </Link>
-  <Link to="/table">
-    <ListItem button>
-      <ListItemText primary="Table" />
-    </ListItem>
-  </Link>
+    <Link to="/">
+      <ListItem button>
+        <ListItemText primary="Home" />
+      </ListItem>
+    </Link>
+    <Link to="/table">
+      <ListItem button>
+        <ListItemText primary="Table" />
+      </ListItem>
+    </Link>
+    <Link to="/filtering">
+      <ListItem button>
+        <ListItemText primary="Filters" />
+      </ListItem>
+    </Link>
+    <Link to="/sorting">
+      <ListItem button>
+        <ListItemText primary="Sorting" />
+      </ListItem>
+    </Link>
+    <Link to="/pagination">
+      <ListItem button>
+        <ListItemText primary="Pagination" />
+      </ListItem>
+    </Link>
   </>
 );
 
@@ -160,7 +176,6 @@ export default function Dashboard(props) {
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
             MUI-List
           </Typography>
-
         </Toolbar>
       </AppBar>
       <Drawer
@@ -177,7 +192,6 @@ export default function Dashboard(props) {
         </div>
         <Divider />
         <List>{mainListItems}</List>
-
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
