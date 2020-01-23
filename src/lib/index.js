@@ -1,3 +1,3 @@
-import List from './list2';
+import List from './list';
 
 export { List };

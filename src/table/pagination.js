@@ -33,19 +33,19 @@ export default () => {
 
   const handlePageNumber = e => {
     const value = Math.ceil(Number(e.target.value));
-    setItemsPerPage(value);
+    setItemsPerPage(value > 0 ? value : 1);
   }
 
   return (<><h2>Pagination example</h2>
-    <Grid md={2}>
+    <Grid md={2} item={true}>
       # of records per page
       <input width="20%" type="number" value={itemsPerPage} onChange={handlePageNumber}/>
     </Grid>
     
     <List
       data={data}
-      columns={columns}
-      itemsPerPage={itemsPerPage}
+      def={columns}
+      nPerPage={itemsPerPage}
     /></>
   );
 }

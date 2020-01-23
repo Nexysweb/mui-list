@@ -1,143 +1,188 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-//import Loader from '../loader';
-import Search from './search';
-import Body from './body';
+
+import NexysUtil from '@nexys/utils';
+
+import { NoRow, ColCell, HeaderUnit, Row, OrderController, ListWrapper, ListContainer, ListHeader, ListBody, RecordInfo } from './ui';
+import { SearchUnit } from './form';
+
+import { order, orderWithPagination } from './order-utils';
+import { applyFilter } from './filter-utils';
+
 import Pagination from './pagination';
 
-import { applyFilter } from './filters-utils';
+import GlobalSearch from './global-search';
 
-const Loader = props => <span>Loader</span>
+const { get } = NexysUtil.ds;
 
-export default class TableIndex extends React.Component {
+export const addRemoveToArray = (v, a = []) => {
+  if(!a) {
+    return [v]
+  }
+
+  if (a.includes(v)) {
+    const idx = a.indexOf(v);
+    a.splice(idx, 1)
+
+    return a;
+  }
+
+  a.push(v);
+
+  return a;
+}
+
+class ListSuper extends React.Component {
   constructor(props) {
     super(props);
 
-    const defaultItemsPerPage = 20;
-    const itemsPerPage = Number(this.props.itemsPerPage) || defaultItemsPerPage;
-    const paginationPosition = props.paginationPosition || 'bottom';
-
-    const pagination = {
-      itemsPerPage,
-      page: 1
-    };
-
-    const filters = props.filters || {};
-
-    const data = this.props.data;
-
     this.state = {
-      data,
-      pagination,
-      paginationPosition,
-      filters
-    };
-  }
-
-  static propTypes = {
-    data: PropTypes.array.isRequired,
-    /** Array of columns with mandatory fields key and title */
-    columns: PropTypes.array.isRequired,
-    itemsPerPage: PropTypes.number,
-    /** Default sorting object of type {key: <column key>, asc: <true/false>} */
-    sortDefault: PropTypes.object,
-    /** If true, search bar is displayed */
-    search: PropTypes.bool,
-    /** Optional callback to be passed when the page is changed. Useful if a service is called on page change */
-    onTableChange: PropTypes.func,
-    /** Optional number of all records. Should be passed if not all data are loaded at once, to calculate the number of pages. */
-    count: PropTypes.number,
-    /** If true, a spinner will be displayed instead of the content. Should be used during data load. */
-    loading: PropTypes.bool,
-    /** Callback function to be called if a filter per column is used */
-    onFilter: PropTypes.func,
-    /** If there is a need to apply filters on the page load, the filters object can be passed to the component */
-    filters: PropTypes.object,
-    /** Possible values 'top', 'bottom' and 'both'. Default is 'bottom' */
-    paginationPosition: PropTypes.string,
-    /** Indicates whether total number of lines should be displayed on top of the table. Default value is false */
-    showTotal: PropTypes.bool
-  }
-
-  handleSearch = (data) => {
-    const pagination = this.state.pagination;
-    pagination.page = 1;
-    this.setState({data, pagination});
-  }
-
-  handlePagination = (pagination) => {
-    this.setState({pagination});
-    if (this.props.onTableChange) {
-      this.props.onTableChange(pagination);
+      sortAttribute: null,
+      sortDescAsc: true,
+      filters: {},
+      pageIdx: 1
     }
   }
 
-  handleSort = () => {
-    const pagination = this.state.pagination;
-    pagination.page = 1;
-    this.setState({pagination});
+  renderHeaders() {
+    return this.props.def.map((h, i) => {
+      const label = h.label === null ? null : h.label || h.name;
+
+      //const order = label ? <OrderControllerUpAndDown onClick={descAsc => this.setOrder(h.name)}/> : null;
+      const order = typeof h.sort === 'boolean' && h.sort === true ? <OrderController onClick={descAsc => this.setOrder(h.name)}/> : null;
+
+      return <HeaderUnit key={i}>{label} {order}</HeaderUnit>;
+    })
   }
 
-  UNSAFE_componentWillReceiveProps(newProps) {
-    const { data, itemsPerPage } = newProps;
-    const { pagination } = this.state;
-    if ( itemsPerPage ) {
-      pagination.itemsPerPage = itemsPerPage;
+  // this manages both strings and categories
+  setFilter = (v) => {
+    const { filters } = this.state;
+
+    if (v.value === null || v.value === '') {
+      //filters.filter(x => x.name !== )
+      delete(filters[v.name]);
+    } else { 
+      // if object
+      if (typeof v.value !== 'string') {
+
+        if (!filters[v.name]) {
+          filters[v.name] = {value: [], func: v.value.func};
+        }
+
+        filters[v.name].value = addRemoveToArray(v.value.value, filters[v.name].value);
+        console.log(filters)
+        
+      } else {
+ 
+        // if string
+        filters[v.name] = v.value === '' ? null : v.value;
+      }
     }
-    this.setState({data, pagination});
+
+    // when a filter is applied, the page index is reset
+    const pageIdx = 1;
+
+    this.setState({filters, pageIdx});
   }
 
-  handleFilter = (fName, fValue) => {
-    const { onFilter } = this.props;
-    console.log(fName)
-    console.log(fValue)
+  renderFilters() {
+    const { filters } = this.state;
 
-    if (onFilter && typeof onFilter === 'function') {
-      onFilter(fName, fValue);
-    } else {
-      const { filters } = this.state;
-      filters[fName] = fValue;
-      const data = applyFilter(this.props.data, filters);
+    return this.props.def.map((h, i) => {
+      if ((typeof h.filter === 'boolean' && h.filter === true) || (typeof h.filter === 'object' && h.filter.type === 'string')) {
+        return (<HeaderUnit key={i}>
+          <SearchUnit name={h.name} value={filters[h.name]} onChange={v => this.setFilter( v)}/>
+        </HeaderUnit>);
+      }
 
-      this.setState({data});
+      if (typeof h.filter === 'object' && h.filter.type === 'category' && Array.isArray(h.filter.options)) {
+      return <HeaderUnit key={i}>
+        {h.filter.options.map((option, i) => <span key={i}><input  type="checkbox" onChange={v => this.setFilter({name: h.name, value: {value: option.id, func: h.filter.func}})}/> {option.name}<br/></span>)}
+      </HeaderUnit>
+      }
+
+      return <HeaderUnit key={i}/>;
+    })
+  }
+
+  /**
+   * defines order to apply
+   * @param  {[type]} name    attribute/column
+   * @param  {[type]} descAsc true/false - asc or desc. if null, will toggle
+   * @return {[type]}         [description]
+   * todo: allow custom ordering
+   */
+  setOrder = (name, descAsc = null) => {
+    if (descAsc === null) {
+      const { sortDescAsc } = this.state;
+      descAsc = !sortDescAsc;
+    }
+
+    this.setState({pageIdx: 1, sortDescAsc: descAsc, sortAttribute: name});
+  }
+
+  changePage = pageIdx => {
+    // todo block beyond max page
+
+    if (pageIdx > 0) {
+      this.setState({pageIdx});
     }
   }
 
-  renderBody() {
-    return (<Body
-      {...this.props}
-      columns={this.props.columns}
-      pagination={this.state.pagination}
-      loading={this.props.loading}
-      sortDefault={this.props.sortDefault}
-      onChange={this.handleSort}
-      onFilter={this.handleFilter}
-      filters={this.props.filters}
-      count={this.props.count}
-      data={this.state.data}
-      />);
+  renderBody(data) {
+    const { def } = this.props;
+    
+    return data.map((row, i) => {
+      return (<tr key={i}>
+        {def.map((h, j) => {
+          return <ColCell key={j}>{h.render ? h.render(row) : get(h.name, row)}</ColCell>
+        })}
+      </tr>);
+    });
   }
 
   render() {
-    const { search, columns, showTotal, count } = this.props;
-    const { data } = this.state;
-
-    const searchBar = search ? <Search data={this.props.data} columns={columns} onChange={this.handleSearch}/> : null;
-    if (data === null) {
-      return <Loader/>;
-    }
-    const paginationTop = (this.state.paginationPosition === 'top' || this.state.paginationPosition === 'both') &&
-      <Pagination data={this.state.data} pagination={this.state.pagination} onChange={this.handlePagination} count={this.props.count}/>;
-    const paginationBottom = (this.state.paginationPosition === 'bottom' || this.state.paginationPosition === 'both') &&
-      <Pagination data={this.state.data} pagination={this.state.pagination} onChange={this.handlePagination} count={this.props.count}/>;
-
-    const countNum = showTotal ? <div className="pull-right"><i>Total <strong>{count || this.props.data.length}</strong> records</i></div> : null;
-    return (<div>
-      { searchBar }
-      { paginationTop }
-      { countNum }
-      { this.renderBody() }
-      { paginationBottom }
-    </div>);
+    return null;
   }
 }
+
+export default class List extends ListSuper {
+  componentDidUpdate(p) {
+
+    this.render();
+  }
+
+  render() {
+    const { data, nPerPage = 5, config = {} } = this.props;
+    const { filters, pageIdx, sortAttribute, sortDescAsc } = this.state;
+
+    const fData = applyFilter(data, filters);
+    const n = fData.length;
+
+    const pData = orderWithPagination(order(fData, sortAttribute, sortDescAsc), pageIdx, nPerPage);
+
+    return (<ListWrapper>
+      <GlobalSearch config={config} onChange={v => this.setFilter(v)} filters={filters}/>
+      <ListContainer>
+        <ListHeader>
+          <Row>
+            {this.renderHeaders()}
+          </Row>
+          <Row>
+            {this.renderFilters()}
+          </Row>
+        </ListHeader>
+        <ListBody>
+          {this.renderBody(pData)}
+        </ListBody>
+      </ListContainer>
+    
+      <RecordInfo n={n} idx={pageIdx} nPerPage={nPerPage}/>
+      <Pagination n={n} nPerPage={nPerPage} idx={pageIdx} onClick={v => this.changePage(v)}/>
+
+      <NoRow n={n}/>
+    </ListWrapper>);
+  }
+}
+
+

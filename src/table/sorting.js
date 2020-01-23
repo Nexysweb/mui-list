@@ -33,7 +33,7 @@ export default () => {
 
   return (<><h2>Simple table example</h2><List
       data={data}
-      columns={columns}
+      def={columns}
       config={config}
     /></>
   );

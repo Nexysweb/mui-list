@@ -13,9 +13,6 @@ export default () => {
     {
       title: 'Capital',
       render: x => x.capital || '',
-      filterName: 'capital',
-      filterType: 'single',
-      filters: [{value: 'Brussels', text: 'Belgium'}, {value: 'Vienna', text: 'Austria'}, {value: 3, text: 'Germany'}]
     },
     {
       name: 'currency',
@@ -33,18 +30,10 @@ export default () => {
     }
   ];
 
-  const myFilters = {
-    capital: []
-  }
-
-  const config = {};
-
   return (<><h2>Filter example</h2><List
       data={data}
-      columns={columns}
-      config={config}
-      search
-      filters={myFilters}
+      def={columns}
+      config={{search: true}}
     /></>
   );
 }
