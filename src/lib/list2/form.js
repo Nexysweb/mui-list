@@ -25,7 +25,7 @@ export class SearchUnit extends React.Component {
 export const SearchUnit = props => {
   //const state = { value: props.value || '' };
 
-  const { name, value, onChange } = props;
+  const { name, onChange } = props;
 
   /*static propTypes = {
     value: PropTypes.string,

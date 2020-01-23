@@ -19,7 +19,7 @@ const data = [
 
 const def = [
   {name: 'name', filter: true, sort: true},
-  {name: 'location.name', filter: {type: 'category', func: (a, b) => a.location.id === b.id, multiple: true, options: [af, eu, as, am]}},
+  {name: 'location.name', filter: {type: 'category', func: (a, b) => b.includes(a.location.id), options: [af, eu, as, am]}},
   {name: 'country.name', label: 'Country', filter: true},
   {name: 'amount', label: 'A long label', filter: true},
   {name: 'int', label: 'd', filter: true},

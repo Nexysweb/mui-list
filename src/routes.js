@@ -11,17 +11,11 @@ const history = History.createBrowserHistory({
   basename: process.env.PUBLIC_URL || '',
 });
 
-export default () => {
- 
-    return (
-      <Router history={history}>
-      <Layout>
-        <Switch>
-          {list.map((l, i) =>  <Route key={i} exact path={l.path} component={() => <l.Component/>}/>)}
-          <Route component={() => <Public/>}/>
-        </Switch>
-      </Layout>
-      </Router>
-    );
-  
-}
+export default () => <Router history={history}>
+  <Layout>
+    <Switch>
+      {list.map((l, i) =>  <Route key={i} exact path={l.path} component={() => <l.Component/>}/>)}
+      <Route component={() => <Public/>}/>
+    </Switch>
+  </Layout>
+  </Router>;

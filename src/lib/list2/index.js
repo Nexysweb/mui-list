@@ -14,6 +14,23 @@ import GlobalSearch from './global-search';
 
 const { get } = NexysUtil.ds;
 
+export const addRemoveToArray = (v, a = []) => {
+  if(!a) {
+    return [v]
+  }
+
+  if (a.includes(v)) {
+    const idx = a.indexOf(v);
+    a.splice(idx, 1)
+
+    return a;
+  }
+
+  a.push(v);
+
+  return a;
+}
+
 class ListSuper extends React.Component {
   constructor(props) {
     super(props);
@@ -44,8 +61,22 @@ class ListSuper extends React.Component {
     if (v.value === null || v.value === '') {
       //filters.filter(x => x.name !== )
       delete(filters[v.name]);
-    } else {
-      filters[v.name] = v.value === '' ? null : v.value;
+    } else { 
+      // if object
+      if (typeof v.value !== 'string') {
+
+        if (!filters[v.name]) {
+          filters[v.name] = {value: [], func: v.value.func};
+        }
+
+        filters[v.name].value = addRemoveToArray(v.value.value, filters[v.name].value);
+        console.log(filters)
+        
+      } else {
+ 
+        // if string
+        filters[v.name] = v.value === '' ? null : v.value;
+      }
     }
 
     // when a filter is applied, the page index is reset
@@ -56,19 +87,18 @@ class ListSuper extends React.Component {
 
   renderFilters() {
     const { filters } = this.state;
-    console.log(filters)
-    
-    return this.props.def.map((h, i) => {
-      console.log(filters[h.name])
 
-      if ((typeof h.filter === 'boolean' && h.filter === true) || typeof h.filter === 'object' && h.filter.type === 'string') {
+    return this.props.def.map((h, i) => {
+      if ((typeof h.filter === 'boolean' && h.filter === true) || (typeof h.filter === 'object' && h.filter.type === 'string')) {
         return (<HeaderUnit key={i}>
           <SearchUnit name={h.name} value={filters[h.name]} onChange={v => this.setFilter( v)}/>
         </HeaderUnit>);
       }
 
       if (typeof h.filter === 'object' && h.filter.type === 'category' && Array.isArray(h.filter.options)) {
-      return <HeaderUnit key={i}>{h.filter.options.map((option, i) => <><input key={i} type="checkbox" onChange={v => this.setFilter(filters[h.name] ? {name: h.name, value: null} : {name: h.name, value: {id: option.id, func: h.filter.func}})}/> {option.name}<br/></>)}</HeaderUnit>
+      return <HeaderUnit key={i}>
+        {h.filter.options.map((option, i) => <span key={i}><input  type="checkbox" onChange={v => this.setFilter({name: h.name, value: {value: option.id, func: h.filter.func}})}/> {option.name}<br/></span>)}
+      </HeaderUnit>
       }
 
       return <HeaderUnit key={i}/>;
@@ -120,16 +150,14 @@ class ListSuper extends React.Component {
 
 export default class List extends ListSuper {
   componentDidUpdate(p) {
-    console.log(p)
-    console.log(this.props);
 
     this.render();
   }
 
   render() {
-    const { data, nPerPage = 5, options, config = {} } = this.props;
+    const { data, nPerPage = 5, config = {} } = this.props;
     const { filters, pageIdx, sortAttribute, sortDescAsc } = this.state;
-    console.log(filters);
+
     const fData = applyFilter(data, filters);
     const n = fData.length;
 

@@ -5,12 +5,12 @@ import Alert from 'lib/components/alert';
 import { paginationBoundaries } from './order-utils';
 
 import { 
-  Table, TableBody, TableCell, TableContainer, TableRow, TableHead
+  Table, TableBody, TableCell, TableRow, TableHead, //TableContainer, 
  } from '@material-ui/core';
 
- import { KeyboardArrowUp as ChevronUp, KeyboardArrowDown as ChevronDown, ImportExport } from '@material-ui/icons';
+import { KeyboardArrowUp as ChevronUp, KeyboardArrowDown as ChevronDown, ImportExport } from '@material-ui/icons';
 
- const Icon = props => <span>{props.name}</span>
+
 
 export class NoRow extends React.Component {
   render() {

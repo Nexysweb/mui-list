@@ -5,8 +5,12 @@ export const compare = (main, search, d) => {
   const mainType = typeof main;
 
   const searchType = typeof search;
+  /*console.log('main')
+  console.log(main)
+  console.log(search)*/
 
   if (searchType === 'string') {  
+    //console.log('string')
     // here casting the `main` so that it can match with the search even if not of the same type  
     switch (mainType) {
       case 'string':
@@ -19,7 +23,11 @@ export const compare = (main, search, d) => {
   }
 
   if (searchType === 'object') {
-    return search.func(d, search)
+    if (search.value.length === 0) {
+      return true;
+    }
+  
+    return search.func(d, search.value)
   }
 
   return false;
@@ -31,7 +39,7 @@ export const compareString = (main, searchString) => main.toLowerCase().indexOf(
 export const searchInObject = (searchString, object) => JSON.stringify(object).toLowerCase().includes(searchString.toLowerCase())  
  
 // same as above but only works with linear object, the rsult will be more precise though
-const searchInObjectLinear =  (searchString, object) => Object.keys(object).map(o => {
+export const searchInObjectLinear =  (searchString, object) => Object.keys(object).map(o => {
   const main = object[o]
 
   return compare(main, searchString);
