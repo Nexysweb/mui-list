@@ -1,475 +1,143 @@
-import React, { Component, Fragment } from 'react';
-import update from 'immutability-helper';
+import React from 'react';
+import PropTypes from 'prop-types';
+//import Loader from '../loader';
+import Search from './search';
+import Body from './body';
+import Pagination from './pagination';
 
-import Icon from '@material-ui/core/Icon';
+import { applyFilter } from './filters-utils';
 
-import { Loader } from '../components';
-import { Wrapper, Input, OptionGroup } from '../components/form';
-import { GridWrapper, GridCell } from '../components/grid';
+const Loader = props => <span>Loader</span>
 
-import Table from '../table';
-
-import Utils from '@nexys/utils';
-
-
-class List extends Component {
+export default class TableIndex extends React.Component {
   constructor(props) {
     super(props);
 
-    const { columns, config } = props;
+    const defaultItemsPerPage = 20;
+    const itemsPerPage = Number(this.props.itemsPerPage) || defaultItemsPerPage;
+    const paginationPosition = props.paginationPosition || 'bottom';
 
-    if (config.draggable) {
-      this.draggable = {
-        ...config.draggable,
-        move: this.move,
-        drop: this.drop
-      };
+    const pagination = {
+      itemsPerPage,
+      page: 1
     };
 
-    const searchIn = columns.filter(item => item.table && item.table.search).map(item => item.name);
+    const filters = props.filters || {};
 
-    let pagination = null;
-    if (config.pagination) {
-      const { rowsPerPageOptions, rowsPerPage } = config.pagination;
-      pagination = {
-        rows: [],
-        rowsPerPageOptions: rowsPerPageOptions || [10, 30, 50, 100],
-        page: 0,
-        rowsPerPage: rowsPerPage || 50,
-        total: null
-      };
-    }
-
-    let sorting = null;
-    if (config.sorting) {
-      const { order, orderBy } = config.sorting;
-      sorting = {
-        order: order || 'asc',
-        orderBy
-      };
-    }
-
-    let { values } = props;
-    values = this.prepareExpandable(values);
+    const data = this.props.data;
 
     this.state = {
-      values,
-      addRows: [],
-      filters: {
-        status: { value: 0 },
-        search: {
-          searchIn
-        }
-      },
-      updatables: {},
-      insertables: {},
+      data,
       pagination,
-      sorting
+      paginationPosition,
+      filters
     };
   }
 
-  prepareExpandable = values => {
-    const { config: { expandable } } = this.props;
-    if (expandable) {
-      const { mapping } = expandable;
-      if (mapping) {
-        return mapping(values);
-      }
-    }
-    return values;
+  static propTypes = {
+    data: PropTypes.array.isRequired,
+    /** Array of columns with mandatory fields key and title */
+    columns: PropTypes.array.isRequired,
+    itemsPerPage: PropTypes.number,
+    /** Default sorting object of type {key: <column key>, asc: <true/false>} */
+    sortDefault: PropTypes.object,
+    /** If true, search bar is displayed */
+    search: PropTypes.bool,
+    /** Optional callback to be passed when the page is changed. Useful if a service is called on page change */
+    onTableChange: PropTypes.func,
+    /** Optional number of all records. Should be passed if not all data are loaded at once, to calculate the number of pages. */
+    count: PropTypes.number,
+    /** If true, a spinner will be displayed instead of the content. Should be used during data load. */
+    loading: PropTypes.bool,
+    /** Callback function to be called if a filter per column is used */
+    onFilter: PropTypes.func,
+    /** If there is a need to apply filters on the page load, the filters object can be passed to the component */
+    filters: PropTypes.object,
+    /** Possible values 'top', 'bottom' and 'both'. Default is 'bottom' */
+    paginationPosition: PropTypes.string,
+    /** Indicates whether total number of lines should be displayed on top of the table. Default value is false */
+    showTotal: PropTypes.bool
   }
 
-  componentWillReceiveProps(nextProps) {
-    let { values } = nextProps;
-    values = this.prepareExpandable(values);
-    this.setState({values, updateLoading: false});
+  handleSearch = (data) => {
+    const pagination = this.state.pagination;
+    pagination.page = 1;
+    this.setState({data, pagination});
   }
 
-
-  loadingUpdate = () => this.setState({updateLoading: true});
-
-  // Utils.debounce(call, 250);
-  handleFilterChange = ({name, value}) => {
-    this.setState(prevState => ({
-      ...prevState,
-      filters: {
-        ...prevState.filters,
-        [name]: {
-          ...prevState.filters[name],
-          value
-        }
-      }
-    }))
-  };
-
-
-  /*** COLUMN FILTERS ***/
-  handleColumnFilter = (checked, {id, name}, colName) => {
-    // TODO: support greater & less than
-    // TODO: handle & activate every filter value separately
-    this.setState(prevState => ({
-      ...prevState,
-      filters: {
-        ...prevState.filters,
-        [colName]: {
-          ...prevState.filters[colName],
-          [name]: checked,
-          [id]: checked
-        }
-      }
-    }));
-  }
-
-  applyColumnFilter = colName => {
-    this.setState(prevState => ({
-      ...prevState,
-      filters: {
-        ...prevState.filters,
-        [colName]: {
-          ...prevState.filters[colName],
-          filterIsActive: true
-        }
-      }
-    }));
-  }
-
-  resetColumnFilter = colName => {
-    this.setState(prevState => ({
-      ...prevState,
-      filters: {
-        ...prevState.filters,
-        [colName]: {}
-      }
-    }));
-  }
-  /******************/
-
-
-  /*** SORTING ***/
-  handleSort = colName => {
-    const { sorting } = this.state;
-
-    let order = 'desc';
-    if (sorting && sorting.orderBy === colName) {
-      order = sorting.order === 'asc' ? 'desc' : 'asc';
-    }
-
-    this.setState(prevState => ({
-      ...prevState,
-      sorting: {
-        orderBy: colName,
-        order
-      }
-    }));
-  }
-  /******************/
-
-
-  /*** PAGINATION ***/
-  handleChangePage = (event, page) => this.setState(prevState => ({
-    ...prevState,
-    pagination: {
-      ...prevState.pagination,
-      page
-    }
-  }));
-
-  handleChangeRowsPerPage = event => this.setState(prevState => ({...prevState, pagination: {...prevState.pagination, rowsPerPage: event.target.value }}));
-  /******************/
-
-
-  /*** DRAG & DROP ***/
-  move = (dragId, hoverId) => {
-    if (dragId !== undefined && hoverId !== undefined) {
-      const { values } = this.state;
-
-      const dragItem = values.find(e => e.id === dragId);
-      const dragIdx = values.findIndex(e => e.id === dragId);
-      const hoverIdx = values.findIndex(e => e.id === hoverId);
-
-      const newValues = update(values, {
-        $splice: [[dragIdx, 1], [hoverIdx, 0, dragItem]]
-      });
-      /***
-       * {$splice: array of arrays} for each item in arrays call splice() on the target with the parameters provided by the item.
-       * Note: The items in the array are applied sequentially, so the order matters. The indices of the target may change during the operation.
-       **/
-
-      this.setState({values: newValues});
+  handlePagination = (pagination) => {
+    this.setState({pagination});
+    if (this.props.onTableChange) {
+      this.props.onTableChange(pagination);
     }
   }
 
-  drop = async (draggedId, id) => {
-    if (this.draggable.handler) {
-      // pass async list fetcher as callback?
-      this.draggable.handler(draggedId, id);
-      /*
-        if (uriPrefix && fetchList) {
-          const uri = `${uriPrefix}/move/${draggedId}/${id}`;
-          // TODO: migrate
-          const result = await HTTPClient.get(uri);
-          if (result.status === 200) fetchList();
-        }
-      */
+  handleSort = () => {
+    const pagination = this.state.pagination;
+    pagination.page = 1;
+    this.setState({pagination});
+  }
+
+  UNSAFE_componentWillReceiveProps(newProps) {
+    const { data, itemsPerPage } = newProps;
+    const { pagination } = this.state;
+    if ( itemsPerPage ) {
+      pagination.itemsPerPage = itemsPerPage;
+    }
+    this.setState({data, pagination});
+  }
+
+  handleFilter = (fName, fValue) => {
+    const { onFilter } = this.props;
+    console.log(fName)
+    console.log(fValue)
+
+    if (onFilter && typeof onFilter === 'function') {
+      onFilter(fName, fValue);
     } else {
-      console.warn('No draggable move handler specified')
-    }
-  }
-  /*******************/
+      const { filters } = this.state;
+      filters[fName] = fValue;
+      const data = applyFilter(this.props.data, filters);
 
-
-  /*** STATUS WIDGET ***/
-  renderStatus = () => {
-    const { config } = this.props;
-    const { filters } = this.state;
-
-    // TODO: work with status name?
-    return (
-      <OptionGroup
-        name="status"
-        options={config.status}
-        selectedValue={filters.status.value}
-        handleChange={this.handleFilterChange}
-        label={'status.select'} // TODO: translation: i18n.translate('status.select')
-        // selectedColor={adminColor}
-        compact
-        simple
-        all
-      />
-    );
-  }
-  /******************/
-
-  /*** SEARCH WIDGET ***/
-  renderSearch = () => {
-    const { filters } = this.state;
-
-    // TODO
-    // - debounce: https://toughcompetent.com/blog/es5-es6-debounce-react-events-on-inputs/
-    // - throttle: https://www.peterbe.com/plog/how-to-throttle-and-debounce-an-autocomplete-input-in-react
-    // use: https://www.npmjs.com/package/throttle-debounce
-    return (
-      <Wrapper name="search" label={'filters.search'} inline>
-        <Input
-          value={filters.search.value}
-          onChange={this.handleFilterChange}
-          placeholder={'filters.search.type'} // TODO: i18n.translate(..)
-          suffix={<Icon color="primary">search</Icon>}
-        />
-      </Wrapper>
-    );
-  }
-  /******************/
-
-
-  filter = () => {
-    let { values, filters } = this.state;
-
-    if (values) {
-      const { search: searchFilter, status: statusFilter } = filters;
-
-      if (statusFilter && statusFilter.value > 0) {
-        values = values.filter(item => item.status.id === statusFilter.value);
-      }
-
-      if (searchFilter && searchFilter.value) {
-        values = values.filter(item => {
-          const searchValue = searchFilter.value.toLowerCase();
-          // TODO: columns, search?
-          return searchFilter.searchIn.some(nameItem => {
-            let accessedValue = Utils.ds.get(nameItem, item);
-            accessedValue = isNaN(accessedValue) ? accessedValue.toLowerCase() : String(accessedValue);
-            if (accessedValue) return accessedValue.includes(searchValue);
-            else return false;
-          });
-        });
-      }
-
-      filters = Utils.ds.removeProps(filters, ['status', 'search']);
-      const filterCols = Object.keys(filters);
-
-      filterCols.forEach(colName => {
-        let filter = filters[colName];
-        console.log(filter, filter.active);
-        if (filter && filter.filterIsActive) {
-          filter = Utils.ds.removeProp(filter, 'filterIsActive');
-          const anySet = Object.values(filter).some(item => item);
-          if (anySet) {
-            // TODO: boolean vs domain
-            values = values.filter(item => {
-              // get column object or value from linearized key
-              let colItem = Utils.ds.get(colName, item);
-              if (colItem === null || colItem === undefined) colItem = Utils.ds.get(colName + "Set", item);
-              // get value from column object or keep value from linearized key
-              const value = typeof colItem === 'object' && colItem !== null ? colItem.name || colItem.id : colItem; 
-              return filter[value];
-            });
-          }
-        }
-      });
-    }
-
-    return values;
-  }
- 
-  toggle = (storeKey, values, prefix=null) => id => {
-    let key = id;
-    if (prefix) key = `${prefix}-${id}`;
-    if (key in this.state[storeKey]) {
-      this.setState(prevState => {
-        const store = prevState[storeKey];
-        delete store[key];
-        return {
-          ...prevState,
-          [storeKey]: store
-        };
-      });
-    } else {
-      const data = values.find(item => item.id === id);
-      this.setState(prevState => ({
-        ...prevState,
-        [storeKey]: {
-          ...prevState[storeKey],
-          [key]: {
-            data: {...data},
-            errors: {}
-          }
-        }
-      }));
+      this.setState({data});
     }
   }
 
-  toggleEdit = (values, depth=null) => id => {
-    this.toggle('updatables', values, depth)(id);
-  }
-
-  toggleAdd = (values, depth=null) => id => {
-    this.toggle('insertables', values, depth)(id);
-  }
-
-  handleChange = (store, id, prefix) => change => {
-    const key = prefix ? `${prefix}-${id}` : id;
-    const item = this.state[store][key];
-
-    const data = Utils.ds.updateObject(item.data, change);
-    this.setState(prevState => ({
-      ...prevState,
-      [store]: {
-        ...prevState[store],
-        [key]: {
-          ...item,
-          data
-        }
-      }
-    }));
-  }
-
-  // TODO: depth isn't exclusive for nested ids that are similar
-  handleEdit = (depth=null) => id => change => {
-    this.handleChange('updatables', id, depth)(change);
-  }
-
-  handleAdd = (depth=null) => id => change => {
-    this.handleChange('insertables', id, depth)(change);
-  }
-
-  /*
-    TODO:
-    handleDelete = delete => id => {
-      call delete (without fetch)
-      & remove from values
-    }
-  */
-
-  // TODO: handle nesting
-  add = (key=null) => {
-    // keyComps = key.split('_');
-    if (!key) {
-      // TODO: robust id
-      const id = Math.max(...this.state.values.map(item => item.id))+1;
-      this.setState(prevState => ({
-        ...prevState,
-        values: [
-          ...prevState.values,
-          { add: true, id }
-        ]
-      }), () => this.toggleAdd(this.state.values, key)(id));
-    } 
-
-    console.log('add');
-    //else {
-      // let { config: { expandable } } = this.props;
-      // need all the ids
-    //}
-  }
-
-  remove = (key=null) => id => {
-    // if key => key.split();
-    if (!key) {
-      this.setState(prevState => ({
-        ...prevState,
-        values: prevState.values.filter(item => item.id !== id)
-      }));
-    }
+  renderBody() {
+    return (<Body
+      {...this.props}
+      columns={this.props.columns}
+      pagination={this.state.pagination}
+      loading={this.props.loading}
+      sortDefault={this.props.sortDefault}
+      onChange={this.handleSort}
+      onFilter={this.handleFilter}
+      filters={this.props.filters}
+      count={this.props.count}
+      data={this.state.data}
+      />);
   }
 
   render() {
-    let { config: { search, status } } = this.props;
-    const { filters, sorting, pagination, updatables, insertables, updateLoading } = this.state;
+    const { search, columns, showTotal, count } = this.props;
+    const { data } = this.state;
 
-    let filteredValues = this.filter();
-    
-    if (!filteredValues) return <Loader />;
-
-    if (sorting) {
-      const { order, orderBy } = sorting;
-      filteredValues = Utils.ds.sortByProp(filteredValues, orderBy, order === 'asc'); 
+    const searchBar = search ? <Search data={this.props.data} columns={columns} onChange={this.handleSearch}/> : null;
+    if (data === null) {
+      return <Loader/>;
     }
+    const paginationTop = (this.state.paginationPosition === 'top' || this.state.paginationPosition === 'both') &&
+      <Pagination data={this.state.data} pagination={this.state.pagination} onChange={this.handlePagination} count={this.props.count}/>;
+    const paginationBottom = (this.state.paginationPosition === 'bottom' || this.state.paginationPosition === 'both') &&
+      <Pagination data={this.state.data} pagination={this.state.pagination} onChange={this.handlePagination} count={this.props.count}/>;
 
-    let pageValues = null;
-    if (pagination) {
-      const { page, rowsPerPage } = pagination;
-      pageValues = filteredValues.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-    }
-
-
-    return (
-      <Fragment>
-        {(status || search) && (
-          <GridWrapper admin>
-            <GridCell span2>{status && this.renderStatus()}</GridCell>
-            <GridCell>{search && this.renderSearch()}</GridCell>
-          </GridWrapper>
-        )}
-        <div style={{marginTop: 30}}>
-          <Table
-            {...this.props}
-            updateLoading={updateLoading}
-            loadingUpdate={this.loadingUpdate}
-            values={pageValues || filteredValues}
-            handleEdit={this.handleEdit}
-            handleAdd={this.handleAdd}
-            filters={filters}
-            applyFilter={this.applyColumnFilter}
-            resetFilter={this.resetColumnFilter}
-            onFilterChange={this.handleColumnFilter}
-            sorting={sorting}
-            onSort={this.handleSort}
-            pagination={pagination && {...pagination, count: filteredValues.length}}
-            handleChangePage={this.handleChangePage}
-            handleChangeRowsPerPage={this.handleChangeRowsPerPage}
-            draggable={this.draggable}
-            updatables={updatables}
-            insertables={insertables}
-            toggleEdit={this.toggleEdit}
-            toggleAdd={this.toggleAdd}
-            add={this.add}
-            remove={this.remove}
-          />
-        </div>
-      </Fragment>
-    );
+    const countNum = showTotal ? <div className="pull-right"><i>Total <strong>{count || this.props.data.length}</strong> records</i></div> : null;
+    return (<div>
+      { searchBar }
+      { paginationTop }
+      { countNum }
+      { this.renderBody() }
+      { paginationBottom }
+    </div>);
   }
 }
-
-export default List;

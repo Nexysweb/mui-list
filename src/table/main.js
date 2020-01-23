@@ -1,20 +1,19 @@
 import React from 'react';
-import './App.css';
 
-import List from './lib/list';
+import List from 'lib/list2';
 
 // data taken from 
 import  data from 'world-countries';
 
-function App() {
-  console.log(data)
-
-
+export default () => {
   const columns = [
     {name: 'name', label: 'Name', render: x => {
     return <a href={`https://en.wikipedia.org/wiki/${encodeURIComponent(x.name.common)}`}>{x.name.common}</a>
     }},
-    {name: 'capital', label: 'Capital', render: x => x.capital || ''},
+    {
+      label: 'Capital',
+      render: x => x.capital || ''
+    },
     {name: 'currency', label: 'Currency', render: x => {
       const keys = Object.keys(x.currencies);
 
@@ -24,25 +23,15 @@ function App() {
 
       const k = keys[0]
       return `${x.currencies[k].name} (${k})`
-    }},
-    //{name: 'iso2', label: 'ISO2', render: x => x.cca2},
-    //{name: 'iso3', label: 'ISO3', render: x => x.cca3},
+    }}
   ];
 
-  const config = {
-    //view: r => '/test',
-    //update: (id, r) => {},
-    //delete: (id, r) => this.props.delete(r.certId, id),
-    //edit: true,
-    //search: true,
-  };
+  const config = {};
 
-  return (<List
-      values={data}
-      columns={columns}
+  return (<><h2>Simple table example</h2><List
+      data={data}
+      def={columns}
       config={config}
-    />
+    /></>
   );
 }
-
-export default App;
