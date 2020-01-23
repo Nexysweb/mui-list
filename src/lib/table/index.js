@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 import PropTypes from 'prop-types';
@@ -40,32 +40,45 @@ const SubMenu = styled(Menu)`
 `;
 
 
-class MuiTable extends Component {
+const MuiTable = props => {
+  const {
+    applyFilter,
+    config,
+    values,
+    errors,
+    filters,
+    pagination,
+    withoutHeader,
+    handleChangePage,
+    handleChangeRowsPerPage,
+    updateLoading, updatables, insertables,
+    sorting,
+    toggleExpansion, toggleEdit, toggleAdd,
+    handleEdit, handleAdd, remove
+  } = props;
 
+  const createSortHandler = colName => e => props.onSort(colName);
 
-  createSortHandler = colName => e => this.props.onSort(colName);
+  //const openFilterMenu = anchorName => event => this.setState({[anchorName]: event.currentTarget});
+  const closeFilterMenu = anchorName => e => null; // to rework this.setState({[anchorName]: null});
 
-  openFilterMenu = anchorName => event => this.setState({[anchorName]: event.currentTarget});
-  closeFilterMenu = anchorName => e => this.setState({[anchorName]: null});
+  const handleFilter = (e, checked, item, colName) => props.onFilterChange(checked, item, colName);
 
-  handleFilter = (e, checked, item, colName) => this.props.onFilterChange(checked, item, colName);
-
-  submitFilter = colName => {
-    const { applyFilter } = this.props;
-    const closeFilter = this.closeFilterMenu(colName);
+  const submitFilter = colName => {
+    
+    const closeFilter = closeFilterMenu(colName);
     closeFilter();
     applyFilter(colName);
   }
 
-  resetFilter = colName => {
-    const { resetFilter } = this.props;
-    const closeFilter = this.closeFilterMenu(colName);
+  const resetFilter = colName => {
+    const closeFilter = closeFilterMenu(colName);
     closeFilter();
     resetFilter(colName);
   }
 
-  renderFilter = col => {
-    const { filters } = this.props;
+  const renderFilter = col => {
+
     const colFilters = filters[col.name];
 
     const anchorName = col.name;
@@ -73,13 +86,13 @@ class MuiTable extends Component {
 
     // TODO: refactor filters
     let columnFilters = col.table && col.table.filters;
-    if (!Array.isArray(columnFilters)) columnFilters = this.props[columnFilters];
+    if (!Array.isArray(columnFilters)) columnFilters = props[columnFilters];
 
     return (
       <SubMenu
         id="filter-menu"
         anchorEl={anchorEl}
-        onClose={this.closeFilterMenu(anchorName)}
+        onClose={closeFilterMenu(anchorName)}
         open={Boolean(anchorEl)}>
         {columnFilters.map(item => (
           <MenuItem onClick={() => {}} style={{paddingLeft: 15}}>
@@ -89,7 +102,7 @@ class MuiTable extends Component {
                   name={item.name}
                   color="primary"
                   checked={colFilters && colFilters[item.value || item.name]}
-                  onChange={(e, checked) => this.handleFilter(e, checked, item, col.name)}
+                  onChange={(e, checked) => handleFilter(e, checked, item, col.name)}
                 />
               }
               label={item.label || item.name}
@@ -98,19 +111,18 @@ class MuiTable extends Component {
         ))}
         <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
           {/* TODO: i18n.translate */}
-          <Button onClick={() => this.submitFilter(col.name)} label={'submit'} primary flat />
-          <Button onClick={() => this.resetFilter(col.name)} label={'reset'} primary flat />
+          <Button onClick={() => submitFilter(col.name)} label={'submit'} primary flat />
+          <Button onClick={() => resetFilter(col.name)} label={'reset'} primary flat />
         </div>
       </SubMenu>
     );
   }
 
   // TODO: hiddenColumns
-  renderCols = (columns, actions={}, expandable, hasAction) => {
+  const renderCols = (columns, actions={}, expandable, hasAction) => {
     hasAction = hasAction || expandable;
 
     let { create } = actions;
-    let { sorting } = this.props;
 
     columns = columns.map((col, id) => {
       const value = col.renderHead ? col.renderHead(col) : col.label; // i18n.translate(col.label) 
@@ -118,7 +130,7 @@ class MuiTable extends Component {
 
       // NOTE: column filter
       let columnFilters = col.table && col.table.filters;
-      if (!Array.isArray(columnFilters)) columnFilters = this.props[columnFilters];
+      if (!Array.isArray(columnFilters)) columnFilters = props[columnFilters];
 
       return (
         <TableCell
@@ -136,13 +148,13 @@ class MuiTable extends Component {
               <TableSortLabel
                 active={sorting && sorting.orderBy === col.name}
                 direction={(sorting && sorting.order) || 'desc'}
-                onClick={this.createSortHandler(col.name)}>
+                onClick={createSortHandler(col.name)}>
                 {value}
               </TableSortLabel>
             </Tooltip> : value
           }
           {columnFilters && (
-            <Fragment>
+            <>
               <Tooltip
                 id={`${col.name}-filter-tooltip`}
                 title={'filter.info'} // TODO: i18n.translate(..)
@@ -150,12 +162,13 @@ class MuiTable extends Component {
                 enterDelay={300}>
                 <IconButton
                   style={{fontSize: 16}}
-                  onClick={this.openFilterMenu(col.name)}>
+                  > 
+                  {/*{/* onClick={openFilterMenu(col.name)}*/}
                   <Icon style={{fontSize: 16}}>filter_list</Icon>
                 </IconButton>
               </Tooltip>
-              {this.renderFilter(col)}
-            </Fragment>
+              {renderFilter(col)}
+            </>
           )}
         </TableCell>
       );
@@ -166,7 +179,7 @@ class MuiTable extends Component {
       if (create) {
         col = (
           <TableCell style={{width: 200, textAlign: 'right'}}>
-            <IconButton onClick={e => this.props.add()}>
+            <IconButton onClick={e => props.add()}>
               <Icon color="primary">add_box</Icon>
             </IconButton> 
           </TableCell>
@@ -178,14 +191,13 @@ class MuiTable extends Component {
     return columns;
   }
   
-  renderFormElem = (editable, col, item, handleChange) => {
-    const { errors } = this.props;
+  const renderFormElem = (editable, col, item, handleChange) => {
 
     const name = (editable && editable.name) || col.name;
     const value = Utils.ds.get(name, item);
 
     if (editable.render) {
-      return editable.render(name, value, item, this.props);
+      return editable.render(name, value, item, props);
     }
 
     const defaultValue = Utils.ds.get(editable.defaultName || name, item);
@@ -195,7 +207,7 @@ class MuiTable extends Component {
           <Wrapper name={name} errors={errors} inline>
             <Select
               value={value || defaultValue}
-              values={this.props[editable.values]}
+              values={props[editable.values]}
               onChange={handleChange}
             />
           </Wrapper>
@@ -216,40 +228,40 @@ class MuiTable extends Component {
   }
 
   // TODO: if errors keep toggled
-  submit = (e, handleSubmit, handleEscape) => {
+  const submit = (e, handleSubmit, handleEscape) => {
     if (e.key) {
       if (e.key === 'Enter' && !e.shiftKey) {
-        this.props.loadingUpdate();
+        props.loadingUpdate();
         handleEscape();
       }
       handleSubmit(e);
     } else {
-      this.props.loadingUpdate();
+      props.loadingUpdate();
       handleEscape();
       handleSubmit(e);
     }
   }
 
-  renderRowForm = (data, onChange, {save, cancel, deleteAction}, columns, i) => {
+  const renderRowForm = (data, onChange, {save, cancel, deleteAction}, columns, i) => {
     // TODO: show loader inside row while update takes place
     const RowForm = withForm(({data, handleChange, handleSubmit, handleSubmitKey, handleEscape}) => (
-      <TableRow key={i} onKeyUp={e => this.submit(e, handleSubmitKey, handleEscape)}>
+      <TableRow key={i} onKeyUp={e => submit(e, handleSubmitKey, handleEscape)}>
         {columns.map((col, j) => (
           <TableCell
             padding={j===0 ? "none" : 'default'}
             numeric={col.numeric || false}
             className={col.alignCenter && "text-center"}>
             {col.editable ? (
-              this.renderFormElem(col.editable, col, data, handleChange)
+              renderFormElem(col.editable, col, data, handleChange)
             ) : (
-              <OverflowTooltip>{col.render(data, col, this.props)}</OverflowTooltip>
+              <OverflowTooltip>{col.render(data, col, props)}</OverflowTooltip>
             )}
           </TableCell>
         ))} 
         <TableCell style={{width: 200, textAlign: 'right'}}>
           {/* TODO: i18n.translate(..) */}
           <Tooltip id="edit.save" enterDelay={500} title={'save'} placement="top">
-            <IconButton onClick={e => this.submit(e, handleSubmit, handleEscape)}>
+            <IconButton onClick={e => submit(e, handleSubmit, handleEscape)}>
               <Icon color="primary">save</Icon>
             </IconButton>
           </Tooltip>
@@ -279,7 +291,7 @@ class MuiTable extends Component {
     // TODO: display errors without label
     return (
       <RowForm
-        {...this.props}
+        {...props}
         data={data}
         handleChange={onChange(data.id)}
         update={save}
@@ -289,10 +301,9 @@ class MuiTable extends Component {
     );
   }
 
-  assembleActions = (config={}, values, key) => {
-    const { handleEdit, handleAdd, remove } = this.props;
+  const assembleActions = (config={}, values, key) => {
+    
     const { view=false, edit=false, update=false, create=false } = config;
-    let { toggleEdit, toggleAdd } = this.props;
     let { delete: deleteAction=false } = config;
 
     let onChangeEdit, onChangeAdd = false;
@@ -321,10 +332,9 @@ class MuiTable extends Component {
     };
   }
 
-  renderRow = (item, actions, expandable, columns, parentKey, i) => {
+  const renderRow = (item, actions, expandable, columns, parentKey, i) => {
     let { view, edit, deleteAction, toggle } = actions;
     // todo , draggable
-    const { config, toggleExpansion } = this.props;
 
     /*** HETEROGENEOUS TABLE ***/
     let flip = false;
@@ -349,7 +359,7 @@ class MuiTable extends Component {
       children = item[expandable.children];
       // key = item.id => this.props.add(item.id)
       expandActions = (
-        <Fragment>
+        <>
           {expandable.create && (
             <IconButton onClick={() => expandable.create(item)}>
               <Icon color="primary">add_box</Icon>
@@ -361,7 +371,7 @@ class MuiTable extends Component {
               handleClick={() => toggleExpansion(item.id)} 
             />
           )}
-        </Fragment>
+        </>
       );
     }
     /************************/
@@ -369,7 +379,7 @@ class MuiTable extends Component {
     const hasParticularAction = (view || edit || deleteAction || expandActions);
 
     const rowContent = (
-      <Fragment>
+      <>
         {columns.map((col, j) => (
           <TableCell
             numeric={col.numeric || false}
@@ -379,8 +389,8 @@ class MuiTable extends Component {
             style={col.styles && col.styles(item)}>
             <OverflowTooltip>
               {(col.view || (col.uri && col.uri(item))) ?
-                <Link to={col.view ? view && view(item, this.props) : col.uri(item)}>{col.render(item, col, this.props)}</Link>
-                : col.render(item, col, this.props)
+                <Link to={col.view ? view && view(item, props) : col.uri(item)}>{col.render(item, col, props)}</Link>
+                : col.render(item, col, props)
               }
             </OverflowTooltip>
           </TableCell>
@@ -396,7 +406,7 @@ class MuiTable extends Component {
               </Tooltip>
             )}
             {view && (
-              <Link to={view(item, this.props)}>
+              <Link to={view(item, props)}>
                 <Tooltip id="view.detail" enterDelay={500} title={'view.detail'} placement="top">
                   {/* TODO: i18n.translate(..) */}
                   <IconButton>
@@ -416,7 +426,7 @@ class MuiTable extends Component {
             {expandActions}
           </TableCell>
         )}
-      </Fragment>
+      </>
     );
 
     // todo: uncomment once bug with CRA solved
@@ -431,24 +441,24 @@ class MuiTable extends Component {
     if (children && item.expanded) {
       let key = item.id;
       if (parentKey) key = `${parentKey}-${key}`;
-      const actions = this.assembleActions(expandable, children, key);
+      const actions = assembleActions(expandable, children, key);
       return (
-        <Fragment>
+        <>
           {row}
           <ExpandedRow
-            columns={this.renderCols(expandable.columns, actions, expandable.expandable)}>
-            {this.renderRows(children, expandable.columns, actions, expandable.expandable, key)}
+            columns={renderCols(expandable.columns, actions, expandable.expandable)}>
+            {renderRows(children, expandable.columns, actions, expandable.expandable, key)}
           </ExpandedRow>
-        </Fragment>
+        </>
       );
     }
 
     return row;
   }
 
-  renderRows = (values=[], columns, actions={}, expandable, parentKey=null) => {
+  const renderRows = (values=[], columns, actions={}, expandable, parentKey=null) => {
     const { view, edit: editFn, update, toggleEdit, create, toggleAdd, deleteAction, onChangeAdd, onChangeEdit } = actions;
-    const { updateLoading, updatables, insertables } = this.props;
+    
 
     values = values.map((item, i) => {
       let edit = editFn;
@@ -474,9 +484,9 @@ class MuiTable extends Component {
             cancel: toggle,
             deleteAction
           };
-          return this.renderRowForm(data, onChange, actions, columns, i);
+          return renderRowForm(data, onChange, actions, columns, i);
         }
-      } else return this.renderRow(item, {view, edit, deleteAction, toggle}, expandable, columns, parentKey, i);
+      } else return renderRow(item, {view, edit, deleteAction, toggle}, expandable, columns, parentKey, i);
     });
 
     if (create) {
@@ -487,63 +497,49 @@ class MuiTable extends Component {
           {columns.map(() => <TableCell />).concat([
             <TableCell style={{textAlign: 'right'}}>
               {/* TODO: i18n.translate(..) */}
-              <Button onClick={() => this.props.add(parentKey)} label={'add'} primary flat />
+              <Button onClick={() => props.add(parentKey)} label={'add'} primary flat />
             </TableCell>
           ])}
         </TableRow>
       ));
     } else return values;
   }
- 
-  render() {
-    const {
-      config,
-      values,
-      filters,
-      pagination,
-      withoutHeader,
-      handleChangePage,
-      handleChangeRowsPerPage
-    } = this.props;
 
-    if (filters && Utils.ds.isEmpty(Utils.ds.removeProps(filters, ['search', 'status'])) && values.length === 0) {
-      return (
-        <div className="top-30">
-          {/* TODO: i18n.translate(..) */}
-          <Alert color="warning">{'noNumRow'}</Alert>
-        </div>
-      );
-    }
-
-    const columns = this.props.columns.filter(item => !item.condition || item.condition(this.props));
-
-    const actions = config && this.assembleActions(config, values);
-    const expandable = config && config.expandable;
-
-    let { view, edit, deleteAction } = actions;
-    const hasAction = (view || edit || deleteAction || expandable);
-
+  if (filters && Utils.ds.isEmpty(Utils.ds.removeProps(filters, ['search', 'status'])) && values.length === 0) {
     return (
-      <Table style={{tableLayout: 'fixed'}}>
-        {!withoutHeader && <TableHead><TableRow>{this.renderCols(columns, actions, expandable, hasAction)}</TableRow></TableHead>}
-        <TableBody>{this.renderRows(values, columns, actions, expandable)}</TableBody>
-        {pagination &&
-          <TableFooter>
-            <TableRow>
-              <TablePagination
-                style={{paddingRight: 15}}
-                colSpan={hasAction ? columns.length+1 : columns.length}
-                {...pagination}
-                onChangePage={handleChangePage}
-                onChangeRowsPerPage={handleChangeRowsPerPage}
-                ActionsComponent={TablePaginationActions}
-              />
-            </TableRow>
-          </TableFooter>
-        }
-      </Table>
+      <div className="top-30">
+        {/* TODO: i18n.translate(..) */}
+        <Alert color="warning">{'noNumRow'}</Alert>
+      </div>
     );
   }
+
+  const columns = props.columns.filter(item => !item.condition || item.condition(props));
+  const actions = config && assembleActions(config, values);
+  const expandable = config && config.expandable;
+  let { view, edit, deleteAction } = actions;
+  const hasAction = (view || edit || deleteAction || expandable);
+ 
+  return (
+    <Table style={{tableLayout: 'fixed'}}>
+      {!withoutHeader && <TableHead><TableRow>{renderCols(columns, actions, expandable, hasAction)}</TableRow></TableHead>}
+      <TableBody>{renderRows(values, columns, actions, expandable)}</TableBody>
+      {pagination &&
+        <TableFooter>
+          <TableRow>
+            <TablePagination
+              style={{paddingRight: 15}}
+              colSpan={hasAction ? columns.length+1 : columns.length}
+              {...pagination}
+              onChangePage={handleChangePage}
+              onChangeRowsPerPage={handleChangeRowsPerPage}
+              ActionsComponent={TablePaginationActions}
+            />
+          </TableRow>
+        </TableFooter>
+      }
+    </Table>
+  );
 }
 
 MuiTable.propTypes = {
