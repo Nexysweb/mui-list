@@ -14,45 +14,6 @@ import * as ListUtils from './utils';
 import Search from './search';
 import Status from './status';
 
-const getPagination = (pagination) => {
-  if (!pagination) {
-    return null;
-  }
-
-  const { rowsPerPageOptions, rowsPerPage } = pagination;
-  return {
-    rows: [],
-    rowsPerPageOptions: rowsPerPageOptions || [10, 30, 50, 100],
-    page: 0,
-    rowsPerPage: rowsPerPage || 50,
-    total: null
-  };
-}
-
-const getSorting = (sorting) => {
-  if (!sorting) {
-    return null;
-  }
-
-  const { order, orderBy } = sorting;
-  return {
-    order: order || 'asc',
-    orderBy
-  };
-}
-
-const getValues = (values, expandable) => {
-  // account for Expandables
-  if (expandable) {
-    const { mapping } = expandable;
-    if (mapping) {
-      return mapping(values);
-    }
-  }
-
-  return values;
-}
-
 class List extends Component {
   constructor(props) {
     super(props);
@@ -69,9 +30,9 @@ class List extends Component {
 
     const searchIn = columns.filter(item => item.table && item.table.search).map(item => item.name);
 
-    const pagination = getPagination(config.pagination);
-    const sorting = getSorting(config.sorting);
-    const values = getValues(props.values, props.config.expandable);
+    const pagination = ListUtils.getPagination(config.pagination);
+    const sorting = ListUtils.getSorting(config.sorting);
+    const values = ListUtils.getValues(props.values, props.config.expandable);
 
     this.state = {
       values,
@@ -90,7 +51,7 @@ class List extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const values =  getValues(nextProps.values, this.props.config.expandable);
+    const values =  ListUtils.getValues(nextProps.values, this.props.config.expandable);
     this.setState({values, updateLoading: false});
   }
 
@@ -337,7 +298,6 @@ class List extends Component {
 
   render() {
     const { config } = this.props;
-
     const { values, filters, sorting, pagination, updatables, insertables, updateLoading } = this.state;
 
     const filteredValues = ListUtils.filter(values, filters);

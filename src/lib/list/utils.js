@@ -65,3 +65,42 @@ export const page = (values, pagination) => {
 
   return values;
 }
+
+export const getPagination = (pagination) => {
+  if (!pagination) {
+    return null;
+  }
+
+  const { rowsPerPageOptions, rowsPerPage } = pagination;
+  return {
+    rows: [],
+    rowsPerPageOptions: rowsPerPageOptions || [10, 30, 50, 100],
+    page: 0,
+    rowsPerPage: rowsPerPage || 50,
+    total: null
+  };
+}
+
+export const getSorting = (sorting) => {
+  if (!sorting) {
+    return null;
+  }
+
+  const { order, orderBy } = sorting;
+  return {
+    order: order || 'asc',
+    orderBy
+  };
+}
+
+export const getValues = (values, expandable) => {
+  // account for Expandables
+  if (expandable) {
+    const { mapping } = expandable;
+    if (mapping) {
+      return mapping(values);
+    }
+  }
+
+  return values;
+}
