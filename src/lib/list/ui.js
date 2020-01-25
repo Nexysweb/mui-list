@@ -8,7 +8,7 @@ import {
   Table, TableBody, TableCell, TableRow, TableHead, //TableContainer, 
  } from '@material-ui/core';
 
-import { KeyboardArrowUp as ChevronUp, KeyboardArrowDown as ChevronDown, ImportExport } from '@material-ui/icons';
+import { KeyboardArrowUp as ChevronUp, KeyboardArrowDown as ChevronDown,  ArrowUpward, ArrowDownward} from '@material-ui/icons';
 
 
 
@@ -65,10 +65,12 @@ export class OrderControllerUpAndDown extends React.Component {
   }
 }
 
-export class OrderController extends React.Component {
-  render() {
-    return (<span onClick={_ => this.props.onClick(null)}><ImportExport/></span>);
-  }
+export const OrderController = props => {
+  const { onClick, descAsc } = props;
+
+  const Icon = descAsc ? ArrowUpward : ArrowDownward;
+
+  return (<small style={{cursor: 'pointer'}} onClick={_ => onClick(null)}><Icon/></small>);
 } 
 
 export class ListWrapper extends React.Component {

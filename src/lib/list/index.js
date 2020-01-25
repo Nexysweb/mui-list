@@ -2,6 +2,8 @@ import React from 'react';
 
 import NexysUtil from '@nexys/utils';
 
+import FilterListIcon from '@material-ui/icons/FilterList';
+
 import { NoRow, ColCell, HeaderUnit, Row, OrderController, ListWrapper, ListContainer, ListHeader, ListBody, RecordInfo } from './ui';
 import { SearchUnit } from './form';
 
@@ -46,9 +48,12 @@ class ListSuper extends React.Component {
   renderHeaders() {
     return this.props.def.map((h, i) => {
       const label = h.label === null ? null : h.label || h.name;
+      const { sortDescAsc} = this.state
+
+      // console.log(sortDescAsc)
 
       //const order = label ? <OrderControllerUpAndDown onClick={descAsc => this.setOrder(h.name)}/> : null;
-      const order = typeof h.sort === 'boolean' && h.sort === true ? <OrderController onClick={descAsc => this.setOrder(h.name)}/> : null;
+      const order = typeof h.sort === 'boolean' && h.sort === true ? <OrderController descAsc={sortDescAsc} onClick={descAsc => this.setOrder(h.name)}/> : null;
 
       return <HeaderUnit key={i}>{label} {order}</HeaderUnit>;
     })
@@ -91,12 +96,14 @@ class ListSuper extends React.Component {
     return this.props.def.map((h, i) => {
       if ((typeof h.filter === 'boolean' && h.filter === true) || (typeof h.filter === 'object' && h.filter.type === 'string')) {
         return (<HeaderUnit key={i}>
+          <FilterListIcon/>
           <SearchUnit name={h.name} value={filters[h.name]} onChange={v => this.setFilter( v)}/>
         </HeaderUnit>);
       }
 
       if (typeof h.filter === 'object' && h.filter.type === 'category' && Array.isArray(h.filter.options)) {
       return <HeaderUnit key={i}>
+        <FilterListIcon/>
         {h.filter.options.map((option, i) => <span key={i}><input  type="checkbox" onChange={v => this.setFilter({name: h.name, value: {value: option.id, func: h.filter.func}})}/> {option.name}<br/></span>)}
       </HeaderUnit>
       }

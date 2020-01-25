@@ -24,7 +24,7 @@ const def = [
   {name: 'amount', label: 'A long label', filter: true},
   {name: 'int', label: 'd', filter: true},
   {name: 'date', label: 'a date', filter: true},
-  {name: 'random', label: 'custom', render: x => 'custom' + x.location}
+  {name: 'random', label: 'custom', render: x => 'custom' + x.location.name}
 ];
 
 export default props => <List data={data} def={def} config={{search: true}} nPerPage="3"/>;
