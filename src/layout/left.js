@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Link } from 'react-router-dom';
-import { list } from '../table';
+import { list } from '../list';
 
 import {
   List, ListItem, ListItemText, Divider,

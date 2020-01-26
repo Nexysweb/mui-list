@@ -5,7 +5,7 @@ import * as History from 'history';
 
 import Public from './public';
 import Layout from './layout';
-import { list } from './table';
+import { list } from './list';
 
 const history = History.createBrowserHistory({
   basename: process.env.PUBLIC_URL || '',

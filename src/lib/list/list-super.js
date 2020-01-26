@@ -2,14 +2,8 @@ import React from 'react';
 
 import NexysUtil from '@nexys/utils';
 
-import { NoRow, ColCell, HeaderUnit, FilterUnit, Row, OrderController, ListWrapper, ListContainer, ListHeader, ListBody, RecordInfo } from './ui/index';
-
-import { order, orderWithPagination } from './order-utils';
-import { applyFilter, addRemoveToArray } from './filter-utils';
-
-import Pagination from './pagination';
-
-import GlobalSearch from './ui/global-search';
+import { ColCell, HeaderUnit, FilterUnit, Row, OrderController } from './ui/index';
+import { addRemoveToArray } from './filter-utils';
 
 const { get } = NexysUtil.ds;
 
@@ -105,34 +99,6 @@ export default class ListSuper extends React.Component {
   }
 
   render() {
-    const { data, nPerPage = 5, config = {} } = this.props;
-    const { filters, pageIdx, sortAttribute, sortDescAsc } = this.state;
-
-    const fData = applyFilter(data, filters);
-    const n = fData.length;
-
-    const pData = orderWithPagination(order(fData, sortAttribute, sortDescAsc), pageIdx, nPerPage);
-
-    return (<ListWrapper>
-      <GlobalSearch config={config} onChange={v => this.setFilter(v)} filters={filters}/>
-      <ListContainer>
-        <ListHeader>
-          <Row>
-            {this.renderHeaders()}
-          </Row>
-      
-        </ListHeader>
-        <ListBody>
-          {this.renderBody(pData)}
-        </ListBody>
-      </ListContainer>
-    
-      <RecordInfo n={n} idx={pageIdx} nPerPage={nPerPage}/>
-      <Pagination n={n} nPerPage={nPerPage} idx={pageIdx} onClick={v => this.changePage(v)}/>
-
-      <NoRow n={n}/>
-    </ListWrapper>);
+    return null;
   }
 }
-
-
