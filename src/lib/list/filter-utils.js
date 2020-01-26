@@ -76,3 +76,20 @@ export const applyFilter = (data, filters) => {
     .reduce((a, b) => a && b);
   });
 }
+
+export const addRemoveToArray = (v, a = []) => {
+  if(!a) {
+    return [v]
+  }
+
+  if (a.includes(v)) {
+    const idx = a.indexOf(v);
+    a.splice(idx, 1)
+
+    return a;
+  }
+
+  a.push(v);
+
+  return a;
+}

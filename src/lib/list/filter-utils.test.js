@@ -1,4 +1,4 @@
-import { applyFilter, compare, compareString, searchInObject } from './filter-utils';
+import { applyFilter, compare, compareString, searchInObject, addRemoveToArray } from './filter-utils';
 
 test('compareString', () => {
   const main = 'fullString';
@@ -51,3 +51,11 @@ test('filter 2', () => {
 
   expect(applyFilter(data, filters)).toEqual(fData)
 });
+
+test('addRemoveToArray', () => {
+  expect(addRemoveToArray(2)).toEqual([2]);
+  expect(addRemoveToArray(2, [3])).toEqual([3, 2]);
+  expect(addRemoveToArray(3, [3, 2])).toEqual([2])
+  expect(addRemoveToArray(4, [3, 2])).toEqual([3, 2, 4])
+  expect(addRemoveToArray(4, [4])).toEqual([])
+})

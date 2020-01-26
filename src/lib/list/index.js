@@ -2,36 +2,16 @@ import React from 'react';
 
 import NexysUtil from '@nexys/utils';
 
-import FilterListIcon from '@material-ui/icons/FilterList';
-
-import { NoRow, ColCell, HeaderUnit, Row, OrderController, ListWrapper, ListContainer, ListHeader, ListBody, RecordInfo } from './ui';
-import { SearchUnit } from './form';
+import { NoRow, ColCell, HeaderUnit, FilterUnit, Row, OrderController, ListWrapper, ListContainer, ListHeader, ListBody, RecordInfo } from './ui/index';
 
 import { order, orderWithPagination } from './order-utils';
-import { applyFilter } from './filter-utils';
+import { applyFilter, addRemoveToArray } from './filter-utils';
 
 import Pagination from './pagination';
 
-import GlobalSearch from './global-search';
+import GlobalSearch from './ui/global-search';
 
 const { get } = NexysUtil.ds;
-
-export const addRemoveToArray = (v, a = []) => {
-  if(!a) {
-    return [v]
-  }
-
-  if (a.includes(v)) {
-    const idx = a.indexOf(v);
-    a.splice(idx, 1)
-
-    return a;
-  }
-
-  a.push(v);
-
-  return a;
-}
 
 class ListSuper extends React.Component {
   constructor(props) {
@@ -46,16 +26,17 @@ class ListSuper extends React.Component {
   }
 
   renderHeaders() {
+    const { sortDescAsc, filters } = this.state
+
     return this.props.def.map((h, i) => {
       const label = h.label === null ? null : h.label || h.name;
-      const { sortDescAsc} = this.state
-
+      
       // console.log(sortDescAsc)
 
       //const order = label ? <OrderControllerUpAndDown onClick={descAsc => this.setOrder(h.name)}/> : null;
       const order = typeof h.sort === 'boolean' && h.sort === true ? <OrderController descAsc={sortDescAsc} onClick={descAsc => this.setOrder(h.name)}/> : null;
-
-      return <HeaderUnit key={i}>{label} {order}</HeaderUnit>;
+      const filter = <FilterUnit key={i} filters={filters} name={h.name} filter={h.filter} onChange={this.setFilter}/>;
+      return <HeaderUnit key={i}>{label} {order} {filter}</HeaderUnit>;
     })
   }
 
@@ -74,9 +55,7 @@ class ListSuper extends React.Component {
           filters[v.name] = {value: [], func: v.value.func};
         }
 
-        filters[v.name].value = addRemoveToArray(v.value.value, filters[v.name].value);
-        console.log(filters)
-        
+        filters[v.name].value = addRemoveToArray(v.value.value, filters[v.name].value);        
       } else {
  
         // if string
@@ -89,29 +68,6 @@ class ListSuper extends React.Component {
 
     this.setState({filters, pageIdx});
   }
-
-  renderFilters() {
-    const { filters } = this.state;
-
-    return this.props.def.map((h, i) => {
-      if ((typeof h.filter === 'boolean' && h.filter === true) || (typeof h.filter === 'object' && h.filter.type === 'string')) {
-        return (<HeaderUnit key={i}>
-          <FilterListIcon/>
-          <SearchUnit name={h.name} value={filters[h.name]} onChange={v => this.setFilter( v)}/>
-        </HeaderUnit>);
-      }
-
-      if (typeof h.filter === 'object' && h.filter.type === 'category' && Array.isArray(h.filter.options)) {
-      return <HeaderUnit key={i}>
-        <FilterListIcon/>
-        {h.filter.options.map((option, i) => <span key={i}><input  type="checkbox" onChange={v => this.setFilter({name: h.name, value: {value: option.id, func: h.filter.func}})}/> {option.name}<br/></span>)}
-      </HeaderUnit>
-      }
-
-      return <HeaderUnit key={i}/>;
-    })
-  }
-
   /**
    * defines order to apply
    * @param  {[type]} name    attribute/column
@@ -175,9 +131,7 @@ export default class List extends ListSuper {
           <Row>
             {this.renderHeaders()}
           </Row>
-          <Row>
-            {this.renderFilters()}
-          </Row>
+      
         </ListHeader>
         <ListBody>
           {this.renderBody(pData)}
