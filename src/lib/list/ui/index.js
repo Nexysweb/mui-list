@@ -3,6 +3,7 @@ import React from 'react';
 import Alert from 'lib/components/alert';
 import { paginationBoundaries } from '../order-utils';
 import { SearchUnit } from './form';
+import GlobalSearch from './global-search';
 
 import { 
   Table, TableBody, TableCell, TableRow, TableHead, //TableContainer, 
@@ -151,3 +152,5 @@ export const RecordInfo = props => {
   const { start, end } = paginationBoundaries(idx, nPerPage);
   return <p className="pull-right">Showing {start + 1} to {(Number(start) + Number(nPerPage)) > n ? n : end} of {n} entries</p>
 }
+
+export {GlobalSearch}
