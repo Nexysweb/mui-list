@@ -11,37 +11,32 @@ import {
 
 import { KeyboardArrowUp as ChevronUp, KeyboardArrowDown as ChevronDown,  ArrowUpward, ArrowDownward, FilterList as FilterListIcon } from '@material-ui/icons';
 
-
-export class NoRow extends React.Component {
-  render() {
-    if (this.props.n > 0) {
-      return null;
-    }
-
-    return <Alert type="warning">No rows found</Alert>;
+export const NoRow = props => {
+  if (props.n > 0) {
+    return null;
   }
+
+  return <Alert type="warning">No rows found</Alert>;
 }
 
-export class PaginationWrapper extends React.Component {
-  render() {
-    return (<nav>
-      <ul className="pagination">
-        {this.props.children}
-      </ul>
-    </nav>);
-  }
+export const PaginationWrapper = props => {
+  return (<nav>
+    <ul className="pagination">
+      {props.children}
+    </ul>
+  </nav>);
 }
 
 export const PaginationUnit = props => {
-    const { isDisabled } = props;
+  const { isDisabled } = props;
 
-    // here we disable the button in case it is not valid
-    if (isDisabled) {
-      return null;
-    }
+  // here we disable the button in case it is not valid
+  if (isDisabled) {
+    return null;
+  }
 
-    const className = 'page-item' + (props.isActive ? ' active' : '') + (isDisabled ? ' disabled' : '');
-    return <li className={className}><button className="page-link" onClick={props.onClick}>{props.children}</button></li>;
+  const className = 'page-item' + (props.isActive ? ' active' : '') + (isDisabled ? ' disabled' : '');
+  return <li className={className}><button className="page-link" onClick={props.onClick}>{props.children}</button></li>;
 }
 
 export const ColCell = props => {
@@ -52,8 +47,7 @@ export const ColCell = props => {
 export const HeaderUnit= props => {
   const { children } = props;
 
-  return <TableCell>{children}</TableCell> 
-
+  return <TableCell>{children}</TableCell>;
 }
 
 export const PopoverFilter= props => {
@@ -107,13 +101,11 @@ export const FilterUnit = props => {
   return null;
 }
 
-export class OrderControllerUpAndDown extends React.Component {
-  render() {
-    return (<span>
-      <span key={"asc"} onClick={_ => this.props.onClick(true)}><ChevronUp/></span>
-      <span key={"desc"} onClick={_ => this.props.onClick(false)}><ChevronDown/></span>
-    </span>);
-  }
+export const OrderControllerUpAndDown = props => {
+  return (<span>
+    <span key={"asc"} onClick={_ => props.onClick(true)}><ChevronUp/></span>
+    <span key={"desc"} onClick={_ => props.onClick(false)}><ChevronDown/></span>
+  </span>);
 }
 
 export const OrderController = props => {
@@ -124,50 +116,38 @@ export const OrderController = props => {
   return (<small style={{cursor: 'pointer'}} onClick={_ => onClick(null)}><Icon/></small>);
 } 
 
-export class ListWrapper extends React.Component {
-  render() {
-    const { children} = this.props;
-    return <div className="table-responsive-sm">{children}</div>;
-  }
+export const ListWrapper = props => {
+  const { children} = props;
+  return <div className="table-responsive-sm">{children}</div>;
 }
 
-export class ListContainer extends React.Component {
-  render() {
-    const { children} = this.props;
-    return <Table>{children}</Table>;
-  }
+export const ListContainer = props => {
+  const { children} = props;
+  return <Table>{children}</Table>;
 }
 
-export class Row extends React.Component {
-  render() {
-    const { children} = this.props;
-    return <TableRow>{children}</TableRow>;
-  }
+export const Row = props => {
+  const { children} = props;
+  return <TableRow>{children}</TableRow>;
 }
 
-export class ListHeader extends React.Component {
-  render() {
-    const { children} = this.props;
-    return <TableHead>{children}</TableHead>;
-  }
+export const ListHeader = props => {
+  const { children} = props;
+  return <TableHead>{children}</TableHead>;
 }
 
-export class ListBody extends React.Component {
-  render() {
-    const { children} = this.props;
-    return <TableBody>{children}</TableBody>;
-  }
+export const ListBody = props => {
+  const { children} = props;
+  return <TableBody>{children}</TableBody>;
 }
 
-export class RecordInfo extends React.Component {
-  render() {
-    const { nPerPage, idx, n } = this.props;
+export const RecordInfo = props => {
+  const { nPerPage, idx, n } = props;
 
-    if (n === 0) {
-      return null;
-    }
-
-    const { start, end } = paginationBoundaries(idx, nPerPage);
-    return <p className="pull-right">Showing {start + 1} to {(Number(start) + Number(nPerPage)) > n ? n : end} of {n} entries</p>
+  if (n === 0) {
+    return null;
   }
+
+  const { start, end } = paginationBoundaries(idx, nPerPage);
+  return <p className="pull-right">Showing {start + 1} to {(Number(start) + Number(nPerPage)) > n ? n : end} of {n} entries</p>
 }
