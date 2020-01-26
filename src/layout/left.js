@@ -57,11 +57,16 @@ const useStyles = makeStyles(theme => ({
 
 }));
 
-const mainListItems = list.map((l, i) => <Link key={i} to={l.path}>
+const ListUnit = props => {
+  const { label, path } = props;
+  return <Link to={path}>
     <ListItem button>
-      <ListItemText primary={l.label} />
+      <ListItemText primary={label} />
     </ListItem>
-  </Link>);
+  </Link>
+}
+
+const mainListItems = list.map((l, i) => <ListUnit key={i} path={l.path} label={l.label}/>);
 
 export default props => {
   const { onClose, open } = props;
@@ -83,7 +88,10 @@ export default props => {
       </IconButton>
     </div>
     <Divider />
-    <List>{mainListItems}</List>
+    <List>
+      <ListUnit label={'Home'} path={'/'}/>
+      {mainListItems}
+    </List>
 
   </Drawer>
 }
