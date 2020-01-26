@@ -1,11 +1,13 @@
 import React from 'react';
 
 export const SearchUnit = props => {
-  const { name, onChange, value } = props;
+  const [ value, setValue ] = React.useState(props.value || '')
+  const { name, onChange } = props;
 
   const handleChange = e => {
     const value = e.target.value;
     const v = {name, value};
+    setValue(value);
     onChange(v);
   }
 
