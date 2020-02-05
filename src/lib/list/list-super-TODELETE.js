@@ -1,19 +1,14 @@
+// this has been rewritten using hooks
 import React from 'react';
 
 import NexysUtil from '@nexys/utils';
 
-import { NoRow, ColCell, HeaderUnit, FilterUnit, Row, OrderController, ListWrapper, ListContainer, ListHeader, ListBody, RecordInfo } from './ui/index';
-
 import { order, orderWithPagination } from './order-utils';
 import { applyFilter, addRemoveToArray } from './filter-utils';
 
-import Pagination from './pagination';
-
-import GlobalSearch from './ui/global-search';
-
 const { get } = NexysUtil.ds;
 
-export default class ListSuper extends React.Component {
+export default ( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch, NoRow, Row, ListWrapper, ListContainer, ListHeader, ListBody, RecordInfo, Pagination} ) => class ListSuper extends React.Component {
   constructor(props) {
     super(props);
 
@@ -134,5 +129,3 @@ export default class ListSuper extends React.Component {
     </ListWrapper>);
   }
 }
-
-

@@ -1,43 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import NexysUtil from '@nexys/utils';
+import Utils from '@nexys/utils';
 
 import { order, orderWithPagination } from './order-utils';
 import { applyFilter, addRemoveToArray } from './filter-utils';
 
-const { get } = NexysUtil.ds;
+const stateDefault = {
+  sortAttribute: null,
+  sortDescAsc: true,
+  filters: {},
+  pageIdx: 1
+};
 
-export default ( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch, NoRow, Row, ListWrapper, ListContainer, ListHeader, ListBody, RecordInfo, Pagination} ) => class ListSuper extends React.Component {
-  constructor(props) {
-    super(props);
+export default ( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch, NoRow, Row, ListWrapper, ListContainer, ListHeader, ListBody, RecordInfo, Pagination} ) => props => {
+  const [ state, setState ] = useState(stateDefault);
 
-    this.state = {
-      sortAttribute: null,
-      sortDescAsc: true,
-      filters: {},
-      pageIdx: 1
-    }
-  }
+  const { def, data, nPerPage = 5, config = {} } = props;
+  const { filters, pageIdx, sortAttribute, sortDescAsc } = state;
 
-  renderHeaders() {
-    const { sortDescAsc, filters } = this.state
-
-    return this.props.def.map((h, i) => {
+  const renderHeaders = () => {
+    return def.map((h, i) => {
       const label = h.label === null ? null : h.label || h.name;
-      
-      // console.log(sortDescAsc)
 
-      //const order = label ? <OrderControllerUpAndDown onClick={descAsc => this.setOrder(h.name)}/> : null;
-      const order = typeof h.sort === 'boolean' && h.sort === true ? <OrderController descAsc={sortDescAsc} onClick={descAsc => this.setOrder(h.name)}/> : null;
-      const filter = <FilterUnit key={i} filters={filters} name={h.name} filter={h.filter} onChange={this.setFilter}/>;
+      const order = typeof h.sort === 'boolean' && h.sort === true ? <OrderController descAsc={sortDescAsc} onClick={descAsc => setOrder(h.name)}/> : null;
+      const filter = <FilterUnit key={i} filters={filters} name={h.name} filter={h.filter} onChange={setFilter}/>;
       return <HeaderUnit key={i}>{label} {order} {filter}</HeaderUnit>;
     })
   }
 
   // this manages both strings and categories
-  setFilter = (v) => {
-    const { filters } = this.state;
-
+  const setFilter = (v) => {
     if (v.value === null || v.value === '') {
       //filters.filter(x => x.name !== )
       delete(filters[v.name]);
@@ -60,7 +52,7 @@ export default ( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch
     // when a filter is applied, the page index is reset
     const pageIdx = 1;
 
-    this.setState({filters, pageIdx});
+    setState({...state, filters, pageIdx});
   }
   /**
    * defines order to apply
@@ -69,62 +61,48 @@ export default ( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch
    * @return {[type]}         [description]
    * todo: allow custom ordering
    */
-  setOrder = (name, descAsc = null) => {
+  const setOrder = (name, descAsc = null) => {
     if (descAsc === null) {
-      const { sortDescAsc } = this.state;
       descAsc = !sortDescAsc;
     }
 
-    this.setState({pageIdx: 1, sortDescAsc: descAsc, sortAttribute: name});
+    setState({...state, pageIdx: 1, sortDescAsc: descAsc, sortAttribute: name});
   }
 
-  changePage = pageIdx => {
+  const changePage = pageIdx => {
     // todo block beyond max page
-
     if (pageIdx > 0) {
-      this.setState({pageIdx});
+      setState({...state, pageIdx});
     }
   }
 
-  renderBody(data) {
-    const { def } = this.props;
-    
-    return data.map((row, i) => {
-      return (<tr key={i}>
-        {def.map((h, j) => {
-          return <ColCell key={j}>{h.render ? h.render(row) : get(h.name, row)}</ColCell>
-        })}
-      </tr>);
-    });
-  }
+  const renderBody = (data) => data.map((row, i) => <tr key={i}>
+    {def.map((h, j) => {
+      return <ColCell key={j}>{h.render ? h.render(row) : Utils.ds.get(h.name, row)}</ColCell>
+    })}
+  </tr>);
 
-  render() {
-    const { data, nPerPage = 5, config = {} } = this.props;
-    const { filters, pageIdx, sortAttribute, sortDescAsc } = this.state;
+  const fData = applyFilter(data, filters);
+  const n = fData.length;
+  const pData = orderWithPagination(order(fData, sortAttribute, sortDescAsc), pageIdx, nPerPage);
 
-    const fData = applyFilter(data, filters);
-    const n = fData.length;
+  return (<ListWrapper>
+    <GlobalSearch config={config} onChange={v => setFilter(v)} filters={filters}/>
+    <ListContainer>
+      <ListHeader>
+        <Row>
+          {renderHeaders()}
+        </Row>
+      </ListHeader>
 
-    const pData = orderWithPagination(order(fData, sortAttribute, sortDescAsc), pageIdx, nPerPage);
+      <ListBody>
+        {renderBody(pData)}
+      </ListBody>
+    </ListContainer>
+  
+    <RecordInfo n={n} idx={pageIdx} nPerPage={nPerPage}/>
+    <Pagination n={n} nPerPage={nPerPage} idx={pageIdx} onClick={v => changePage(v)}/>
 
-    return (<ListWrapper>
-      <GlobalSearch config={config} onChange={v => this.setFilter(v)} filters={filters}/>
-      <ListContainer>
-        <ListHeader>
-          <Row>
-            {this.renderHeaders()}
-          </Row>
-      
-        </ListHeader>
-        <ListBody>
-          {this.renderBody(pData)}
-        </ListBody>
-      </ListContainer>
-    
-      <RecordInfo n={n} idx={pageIdx} nPerPage={nPerPage}/>
-      <Pagination n={n} nPerPage={nPerPage} idx={pageIdx} onClick={v => this.changePage(v)}/>
-
-      <NoRow n={n}/>
-    </ListWrapper>);
-  }
+    <NoRow n={n}/>
+  </ListWrapper>);
 }
