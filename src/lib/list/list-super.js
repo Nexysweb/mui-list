@@ -2,12 +2,15 @@ import React from 'react';
 
 import NexysUtil from '@nexys/utils';
 
-import { ColCell, HeaderUnit, FilterUnit, Row, OrderController } from './ui/index';
-import { addRemoveToArray } from './filter-utils';
+import { order, orderWithPagination } from './order-utils';
+import { applyFilter, addRemoveToArray } from './filter-utils';
+
+import Pagination from './pagination';
 
 const { get } = NexysUtil.ds;
 
-export default class ListSuper extends React.Component {
+
+export default ( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch, NoRow, Row, ListWrapper, ListContainer, ListHeader, ListBody, RecordInfo} ) => class ListSuper extends React.Component {
   constructor(props) {
     super(props);
 
@@ -87,6 +90,8 @@ export default class ListSuper extends React.Component {
   }
 
   renderBody(data) {
+    // UI components
+    //const { ColCell } = this.props;
     const { def } = this.props;
     
     return data.map((row, i) => {
@@ -99,6 +104,34 @@ export default class ListSuper extends React.Component {
   }
 
   render() {
-    return null;
+    // UI components
+    //const { GlobalSearch, NoRow, Row, ListWrapper, ListContainer, ListHeader, ListBody, RecordInfo } = this.props;
+    const { data, nPerPage = 5, config = {} } = this.props;
+    const { filters, pageIdx, sortAttribute, sortDescAsc } = this.state;
+
+    const fData = applyFilter(data, filters);
+    const n = fData.length;
+
+    const pData = orderWithPagination(order(fData, sortAttribute, sortDescAsc), pageIdx, nPerPage);
+
+    return (<ListWrapper>
+      <GlobalSearch config={config} onChange={v => this.setFilter(v)} filters={filters}/>
+      <ListContainer>
+        <ListHeader>
+          <Row>
+            {this.renderHeaders()}
+          </Row>
+      
+        </ListHeader>
+        <ListBody>
+          {this.renderBody(pData)}
+        </ListBody>
+      </ListContainer>
+    
+      <RecordInfo n={n} idx={pageIdx} nPerPage={nPerPage}/>
+      <Pagination n={n} nPerPage={nPerPage} idx={pageIdx} onClick={v => this.changePage(v)}/>
+
+      <NoRow n={n}/>
+    </ListWrapper>);
   }
 }
