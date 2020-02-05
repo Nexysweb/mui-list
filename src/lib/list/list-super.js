@@ -31,7 +31,6 @@ export default ( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch
   // this manages both strings and categories
   const setFilter = (v) => {
     if (v.value === null || v.value === '') {
-      //filters.filter(x => x.name !== )
       delete(filters[v.name]);
     } else { 
       // if object
