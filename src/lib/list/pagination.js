@@ -22,7 +22,7 @@ export default class Pagination extends React.Component {
     const { nPage } = pagination;
 
     const units = getPageTiles(idx, nPage).map((i) => {
-      if ( i < 0 ) {
+      if ( i < 0 ) { // this does not seem to work, to be fixed
         return <PaginationUnit key={i} isDisabled={true}>...</PaginationUnit>;
       }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import List from 'lib/list';
+import {List} from 'lib/list';
 
 const af = {id: 1, name: 'Africa'};
 const eu = {id: 2, name: 'Europe'};
