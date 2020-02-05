@@ -4,11 +4,9 @@ import NexysUtil from '@nexys/utils';
 
 import { order, orderWithPagination } from './order-utils';
 import { applyFilter, addRemoveToArray } from './filter-utils';
-
 import Pagination from './pagination';
 
 const { get } = NexysUtil.ds;
-
 
 export default ( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch, NoRow, Row, ListWrapper, ListContainer, ListHeader, ListBody, RecordInfo} ) => class ListSuper extends React.Component {
   constructor(props) {
@@ -90,8 +88,6 @@ export default ( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch
   }
 
   renderBody(data) {
-    // UI components
-    //const { ColCell } = this.props;
     const { def } = this.props;
     
     return data.map((row, i) => {
@@ -104,8 +100,6 @@ export default ( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch
   }
 
   render() {
-    // UI components
-    //const { GlobalSearch, NoRow, Row, ListWrapper, ListContainer, ListHeader, ListBody, RecordInfo } = this.props;
     const { data, nPerPage = 5, config = {} } = this.props;
     const { filters, pageIdx, sortAttribute, sortDescAsc } = this.state;
 
