@@ -10,7 +10,7 @@ const GlobalSearch = props => {
 
   const key = "globalSearch";
   const value = filters[key];
-  return <div className="pull-right"><SearchUnit onChange={v => onChange(v)} name={key} value={value}/></div>;
+  return <div className="pull-right"><SearchUnit onChange={onChange} name={key} value={value}/></div>;
 }
 
 export default GlobalSearch;

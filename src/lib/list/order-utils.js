@@ -11,7 +11,6 @@ export const getAttribute = (attribute, a) => {
   return ac;
 }
 
-
 export const order = (data, sortAttribute, sortDescAsc) => {
   if (!sortAttribute) {
     return data;

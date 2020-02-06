@@ -5,6 +5,8 @@ import Utils from '@nexys/utils';
 import { order, orderWithPagination } from './order-utils';
 import { applyFilter, addRemoveToArray } from './filter-utils';
 
+const LoaderDefault = props => <p>Loading...</p>
+
 const stateDefault = {
   sortAttribute: null,
   sortDescAsc: true,
@@ -12,10 +14,13 @@ const stateDefault = {
   pageIdx: 1
 };
 
-export default ( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch, NoRow, Row, ListWrapper, ListContainer, ListHeader, ListBody, RecordInfo, Pagination} ) => props => {
+export default ( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch, NoRow, Row, ListWrapper, ListContainer, ListHeader, ListBody, RecordInfo, Pagination, Loader = LoaderDefault} ) => props => {
   const [ state, setState ] = useState(stateDefault);
+  const [ fpData, setPData ] = useState([]);
+  const [ loading, setLoading ] = useState(true);
+  const [ n, setN ] = useState(0);
 
-  const { def, data, nPerPage = 5, config = {} } = props;
+  const { def, data, nPerPage = 5, config = {}, asyncData = false } = props;
   const { filters, pageIdx, sortAttribute, sortDescAsc } = state;
 
   const renderHeaders = () => {
@@ -81,9 +86,22 @@ export default ( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch
     })}
   </tr>);
 
-  const fData = applyFilter(data, filters);
-  const n = fData.length;
-  const pData = orderWithPagination(order(fData, sortAttribute, sortDescAsc), pageIdx, nPerPage);
+  if (asyncData && loading) {
+    asyncData(state).then(p => {
+      setPData(p);
+      setN(p.length);
+      setLoading(false);
+    });
+
+    return <Loader/>;
+  }
+
+  if(loading) {
+    const fData = applyFilter(data, filters);
+    setLoading(false);
+    setN(fData.length);
+    setPData(orderWithPagination(order(fData, sortAttribute, sortDescAsc), pageIdx, nPerPage));
+  }
 
   return (<ListWrapper>
     <GlobalSearch config={config} onChange={v => setFilter(v)} filters={filters}/>
@@ -95,12 +113,12 @@ export default ( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch
       </ListHeader>
 
       <ListBody>
-        {renderBody(pData)}
+        {renderBody(fpData)}
       </ListBody>
     </ListContainer>
   
     <RecordInfo n={n} idx={pageIdx} nPerPage={nPerPage}/>
-    <Pagination n={n} nPerPage={nPerPage} idx={pageIdx} onClick={v => changePage(v)}/>
+    <Pagination n={n} nPerPage={nPerPage} idx={pageIdx} onClick={changePage}/>
 
     <NoRow n={n}/>
   </ListWrapper>);

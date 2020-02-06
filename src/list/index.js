@@ -4,6 +4,7 @@ import Filters from './filters';
 import Sorting from './sorting';
 import Alert from './alert';
 import Small from './small';
+import Async from './async';
 
 export const list = [
   {label: 'Main', path: '/table', Component: Main},
@@ -11,5 +12,6 @@ export const list = [
   {label: 'Filtering', path: '/filters', Component: Filters},
   {label: 'Sorting', path: '/sorting', Component: Sorting},
   {label: 'Small', path: '/small', Component: Small},
+  {label: 'Async', path: '/async', Component: Async},
   {label: 'Alert', path: '/alert', Component: Alert},
 ]

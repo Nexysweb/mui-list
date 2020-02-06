@@ -1,16 +1,10 @@
-import NexysUtil from '@nexys/utils';
-const { get } = NexysUtil.ds;
+import Utils from '@nexys/utils';
 
 export const compare = (main, search, d) => {
   const mainType = typeof main;
-
   const searchType = typeof search;
-  /*console.log('main')
-  console.log(main)
-  console.log(search)*/
 
-  if (searchType === 'string') {  
-    //console.log('string')
+  if (searchType === 'string') {
     // here casting the `main` so that it can match with the search even if not of the same type  
     switch (mainType) {
       case 'string':
@@ -45,7 +39,6 @@ export const searchInObjectLinear =  (searchString, object) => Object.keys(objec
   return compare(main, searchString);
 })
 .reduce((a, b) => a || b);
-  
 
 export const applyFilter = (data, filters) => {
   const filterArray = Object.keys(filters).map(f => {
@@ -56,12 +49,11 @@ export const applyFilter = (data, filters) => {
     return data;
   }
 
-
   return data.filter(d => {
     return filterArray.map(f => {
       const searchString = f.value;
       const key = f.name;
-      const main = get(key, d);
+      const main = Utils.ds.get(key, d);
 
       if (key === 'globalSearch') {
         return searchInObject(searchString, d)
