@@ -5,7 +5,7 @@ import Utils from '@nexys/utils';
 import { order, orderWithPagination } from './order-utils';
 import { applyFilter, addRemoveToArray } from './filter-utils';
 
-const LoaderDefault = props => <p>Loading...</p>
+const LoaderDefault = () => <p>Loading...</p>
 
 const stateDefault = {
   sortAttribute: null,
