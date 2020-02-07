@@ -14,4 +14,4 @@ const Pagination = PaginationSuper({ PaginationUnit, PaginationWrapper });
 
 const List = ListSuper( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch, NoRow, Row, ListWrapper, ListContainer, ListHeader, ListBody, RecordInfo, Pagination} );
 
-export { List, ListSuper };
+export { List, PaginationSuper, ListSuper };
