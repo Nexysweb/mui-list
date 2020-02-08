@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Alert from 'lib/components/alert';
+import Alert from '../../components/alert';
 import { paginationBoundaries } from '../order-utils';
 import { SearchUnit } from './form';
 import GlobalSearch from './global-search';
