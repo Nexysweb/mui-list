@@ -6,7 +6,7 @@ import { SearchUnit } from './form';
 import GlobalSearch from './global-search';
 
 import { 
-  Table, TableBody, TableCell, TableRow, TableHead, //TableContainer, 
+  Table, TableBody, TableCell, TableRow, TableHead, TableContainer, 
   Popover, IconButton
  } from '@material-ui/core';
 
@@ -124,7 +124,7 @@ export const ListWrapper = props => {
 
 export const ListContainer = props => {
   const { children} = props;
-  return <Table>{children}</Table>;
+  return <TableContainer><Table>{children}</Table></TableContainer>;
 }
 
 export const Row = props => {

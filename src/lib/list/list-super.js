@@ -16,11 +16,12 @@ const stateDefault = {
 
 export default ( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch, NoRow, Row, ListWrapper, ListContainer, ListHeader, ListBody, RecordInfo, Pagination, Loader = LoaderDefault} ) => props => {
   const [ state, setState ] = useState(stateDefault);
-  const [ fpData, setPData ] = useState([]);
-  const [ loading, setLoading ] = useState(true);
-  const [ n, setN ] = useState(0);
+  // todo async
+  //const [ fpData, setPData ] = useState([]);
+  //const [ loading, setLoading ] = useState(true);
+  //const [ n, setN ] = useState(0);
 
-  const { def, data, nPerPage = 5, config = {}, asyncData = false } = props;
+  const { def, data, nPerPage = 5, config = {} } = props; // todo asyn , asyncData = false
   const { filters, pageIdx, sortAttribute, sortDescAsc } = state;
 
   const renderHeaders = () => {
@@ -86,6 +87,8 @@ export default ( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch
     })}
   </tr>);
 
+  /*
+  // todo async
   if (asyncData && loading) {
     asyncData(state).then(p => {
       setPData(p);
@@ -101,7 +104,12 @@ export default ( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch
     setLoading(false);
     setN(fData.length);
     setPData(orderWithPagination(order(fData, sortAttribute, sortDescAsc), pageIdx, nPerPage));
-  }
+  }*/
+
+  
+  const fData = applyFilter(data, filters);
+  const n = fData.length
+  const fpData = orderWithPagination(order(fData, sortAttribute, sortDescAsc), pageIdx, nPerPage);
 
   return (<ListWrapper>
     <GlobalSearch config={config} onChange={v => setFilter(v)} filters={filters}/>
