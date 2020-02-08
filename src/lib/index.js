@@ -1,3 +1,3 @@
-import List from './list/list-super';
+import * as List from './list';
 
 export default List;
