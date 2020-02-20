@@ -1,4 +1,4 @@
-import { 
+/*import { 
   GlobalSearch,
   HeaderUnit,
   FilterUnit,
@@ -6,12 +6,12 @@ import {
   Row, ColCell, RecordInfo, NoRow,
   ListWrapper, ListContainer, ListHeader, ListBody,
   PaginationUnit, PaginationWrapper
-} from './ui';
+} from './ui';*/
 import ListSuper from './list-super';
 import PaginationSuper from './pagination';
 
-const Pagination = PaginationSuper({ PaginationUnit, PaginationWrapper });
+//const Pagination = PaginationSuper({ PaginationUnit, PaginationWrapper });
 
-const List = ListSuper( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch, NoRow, Row, ListWrapper, ListContainer, ListHeader, ListBody, RecordInfo, Pagination} );
+//const List = ListSuper( {HeaderUnit, FilterUnit, OrderController, ColCell, GlobalSearch, NoRow, Row, ListWrapper, ListContainer, ListHeader, ListBody, RecordInfo, Pagination} );
 
-export { List, PaginationSuper, ListSuper };
+export { PaginationSuper, ListSuper }; //List, 
