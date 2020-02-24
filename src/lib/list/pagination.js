@@ -13,7 +13,7 @@ const Pagination = ({PaginationWrapper, PaginationUnit}) => props => {
 
   const units = getPageTiles(idx, nPage).map((i) => {
     if ( i < 0 ) {
-      return <PaginationUnit key={i} isDisabled={true}>...</PaginationUnit>;
+      return <PaginationUnit key={i} isDisabled={false}>...</PaginationUnit>;
     }
 
     return <PaginationUnit key={i} isActive={i === idx} onClick={x => onClick(i)}>{i}</PaginationUnit>;
